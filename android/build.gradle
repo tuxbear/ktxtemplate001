@@ -1,7 +1,7 @@
 apply plugin: 'kotlin-android'
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -25,8 +25,8 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId 'com.central'
-        minSdkVersion 9
+        applicationId 'com.tuxbear.dinos'
+        minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
         versionName '1.0'
