@@ -1,1 +1,2 @@
+include ':backend', ':domain'
 include 'desktop', 'android', 'core'

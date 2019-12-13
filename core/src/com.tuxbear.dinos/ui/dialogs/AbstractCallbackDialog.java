@@ -1,8 +1,8 @@
 package com.tuxbear.dinos.ui.dialogs;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 03/01/14 Time: 16:24 To change this template use File | Settings | File

@@ -55,12 +55,8 @@ public class GameListScreen extends AbstractFullScreen {
         });
 
         rootTable.add(refreshButton).row();
-        gameListWidget = new GameListWidget(ResourceContainer.skin, new GameListWidget.GameSelectedListener() {
-            @Override
-            public void onGameSelected(MultiplayerGame dinoGame) {
-                game.setScreen(new GameScreen(game, dinoGame));
-            }
-        });
+        gameListWidget = new GameListWidget(ResourceContainer.skin, dinoGame ->
+                game.setScreen(new GameScreen(game, dinoGame)));
 
         ScrollPane gameListPane = new ScrollPane(gameListWidget, ResourceContainer.skin);
 
@@ -72,14 +68,11 @@ public class GameListScreen extends AbstractFullScreen {
     private void refreshGameList() {
         loadingGamesProgressDialog.show(stage);
 
-        gameService.getActiveGamesForPlayerAsync(playerService.getCurrentPlayer(), new ServerCallback<List>() {
-            @Override
-            public void processResult(List result, ServerCallResults status) {
-                dinoGames = new ArrayList<MultiplayerGame>(result);
-                gameListWidget.setGameList(dinoGames);
-                rootTable.invalidateHierarchy();
-                loadingGamesProgressDialog.hide();
-            }
+        gameService.getActiveGamesForPlayerAsync(playerService.getCurrentPlayer(), (result, status) -> {
+            dinoGames = new ArrayList<>(result);
+            gameListWidget.setGameList(dinoGames);
+            rootTable.invalidateHierarchy();
+            loadingGamesProgressDialog.hide();
         });
     }
 }

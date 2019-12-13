@@ -7,19 +7,27 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.tuxbear.dinos.domain.events.*;
-import com.tuxbear.dinos.domain.game.*;
-import com.tuxbear.dinos.services.*;
-import com.tuxbear.dinos.services.events.*;
+import com.tuxbear.dinos.domain.game.Board;
+import com.tuxbear.dinos.domain.game.BoardPosition;
+import com.tuxbear.dinos.domain.game.Direction;
+import com.tuxbear.dinos.domain.game.Mission;
+import com.tuxbear.dinos.domain.game.MissionResult;
+import com.tuxbear.dinos.domain.game.Move;
+import com.tuxbear.dinos.domain.game.MoveSequence;
+import com.tuxbear.dinos.domain.game.MultiplayerGame;
+import com.tuxbear.dinos.domain.game.Wall;
+import com.tuxbear.dinos.services.IoC;
+import com.tuxbear.dinos.services.PlayerService;
+import com.tuxbear.dinos.services.ScoreService;
+import com.tuxbear.dinos.services.SettingsService;
+import com.tuxbear.dinos.services.events.EventBus;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.List;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 02/12/13 Time: 18:27 To change this template use File | Settings | File
- * Templates.
- */
 public class BoardWidget extends WidgetGroup {
 
     private PlayerService playerService = IoC.resolve(PlayerService.class);
@@ -125,17 +133,17 @@ public class BoardWidget extends WidgetGroup {
         moveAction.setDuration(dinoActor.getBoardPosition().getDistanceTo(nextPos) * dinoActor.getSpeed());
         moveAction.setInterpolation(Interpolation.pow2Out);
 
-        Move thisMove = new Move();
-        thisMove.setDirection(direction);
-        thisMove.setPieceNumber(dinoActor.getPieceNumber());
+        Move thisMove = new Move(Instant.now().toEpochMilli(), dinoActor.getPieceNumber(), direction);
+
         currentMoveSequence.getMoves().add(thisMove);
 
         setDinoMoving(true);
         currentMissionMovesMade++;
-        eventBus.publishEvent(new DinoMovedEvent());
+        eventBus.publishEvent(new DinoMovedEvent(thisMove));
 
         walkingSoundId = walkingSound.loop(SettingsService.EFFECTS_VOLUME);
         walkingSound.setLooping(walkingSoundId, true);
+
         dinoActor.addAction(sequence(moveAction, run(new Runnable() {
             public void run() {
                 dinoActor.setBoardPosition(nextPos);

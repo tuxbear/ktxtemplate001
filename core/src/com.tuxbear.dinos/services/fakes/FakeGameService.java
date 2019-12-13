@@ -3,7 +3,7 @@ package com.tuxbear.dinos.services.fakes;
 import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
-import com.tuxbear.dinos.services.impl.AzureGameServiceAdapter.responses.GameEventUpdatesResponse;
+import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
 import java.util.*;
 
@@ -21,7 +21,7 @@ public class FakeGameService implements GameService {
     }
 
     @Override
-    public void getActiveGamesForPlayerAsync(Player player, ServerCallback<List> responseCallback) {
+    public void getActiveGamesForPlayerAsync(Player player, ServerCallback<List<MultiplayerGame>> responseCallback) {
 
         responseCallback.processResult( Arrays.asList(
                 generateGame_DELETE_ME(5,15),

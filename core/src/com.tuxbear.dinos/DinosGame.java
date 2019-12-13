@@ -2,13 +2,23 @@
 package com.tuxbear.dinos;
 
 import com.badlogic.gdx.*;
+import com.tuxbear.dinos.services.IoC;
+import com.tuxbear.dinos.services.PlayerService;
 import com.tuxbear.dinos.ui.screens.GameListScreen;
+import com.tuxbear.dinos.ui.screens.LoginOrRegisterScreen;
 
 
 public class DinosGame extends Game {
+
+    PlayerService playerService = IoC.resolve(PlayerService.class);
+
     @Override
     public void create() {
-        setScreen(new GameListScreen(this));
+        if (playerService.getCurrentPlayer() == null) {
+            setScreen(new LoginOrRegisterScreen(this));
+        } else {
+            setScreen(new GameListScreen(this));
+        }
     }
 
     @Override

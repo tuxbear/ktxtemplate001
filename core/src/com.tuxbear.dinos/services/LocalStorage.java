@@ -1,8 +1,11 @@
 package com.tuxbear.dinos.services;
 
+import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.*;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -10,13 +13,11 @@ import java.util.*;
  */
 public interface LocalStorage {
 
-    void saveGames(List<MultiplayerGame> games);
-    void saveChatMessages(List<ChatMessage> messages);
-    void saveCurrentUser(Player player);
-    void saveAccessToken(String token);
+    void saveGames(List<MultiplayerGame> games) throws JsonProcessingException;
+    void saveCurrentUser(Player player) throws JsonProcessingException;
+    void saveAccessToken(AuthenticationResultType token) throws JsonProcessingException;
 
-    List<MultiplayerGame> getAllGames();
-    List<ChatMessage> getAllChatMessagesForGame(String gameId);
-    Player getCurrentUser();
-    String getCurrentAccessToken();
+    List<MultiplayerGame> getAllGames() throws IOException;
+    Player getCurrentUser() throws IOException;
+    AuthenticationResultType getCurrentAccessToken() throws IOException;
 }

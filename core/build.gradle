@@ -5,11 +5,20 @@ sourceCompatibility = 1.8
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+
+    implementation project(":domain")
+
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-cognitoidp', version: '1.11.689'
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.689'
+
+    implementation  "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8"
+
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.badlogicgames.box2dlights:box2dlights:$box2dlightsVersion"
+
     implementation "io.github.libktx:ktx-log:$ktxVersion"
     implementation "io.github.libktx:ktx-scene2d:$ktxVersion"
     implementation "io.github.libktx:ktx-async:$ktxVersion"

@@ -1,7 +1,7 @@
 package com.tuxbear.dinos.services.impl;
 
 import com.tuxbear.dinos.services.*;
-import com.tuxbear.dinos.services.impl.AzureGameServiceAdapter.responses.GameEventUpdatesResponse;
+import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
 import java.util.*;
 

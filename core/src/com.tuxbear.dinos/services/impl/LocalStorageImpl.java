@@ -1,104 +1,76 @@
 package com.tuxbear.dinos.services.impl;
 
+import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.utils.Json;
-import com.tuxbear.dinos.domain.game.ChatMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuxbear.dinos.domain.game.MultiplayerGame;
 import com.tuxbear.dinos.domain.user.Player;
 import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.LocalStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Ole - André Johansen on 02.02.14.
  */
 public class LocalStorageImpl implements LocalStorage {
 
-    Json jsonSerializer = IoC.resolve(Json.class);
-    Preferences saveGamePrefs = Gdx.app.getPreferences("gameSave");
-    Preferences chats = Gdx.app.getPreferences("chats");
-    Preferences userSave = Gdx.app.getPreferences("userSave");
-    Preferences appPrefs = Gdx.app.getPreferences("prefs");
+    ObjectMapper jsonSerializer = IoC.resolve(ObjectMapper.class);
 
     @Override
-    public void saveGames(List<MultiplayerGame> games) {
-        String savedGames = jsonSerializer.toJson(games);
+    public void saveGames(List<MultiplayerGame> games) throws JsonProcessingException {
+        Preferences saveGamePrefs = Gdx.app.getPreferences("gameSave");
+
+        String savedGames = jsonSerializer.writeValueAsString(games);
         saveGamePrefs.putString("allGames", savedGames);
         saveGamePrefs.flush();
     }
 
     @Override
-    public void saveChatMessages(List<ChatMessage> messages) {
+    public void saveCurrentUser(Player player) throws JsonProcessingException {
+        Preferences userSave = Gdx.app.getPreferences("userSave");
 
-        if (messages == null || messages.size() == 0){
-            return;
-        }
-
-        Map<String, List<ChatMessage>> messagesPergame = new HashMap<>();
-
-        for (ChatMessage message : messages) {
-            String gameId = message.getGameId();
-            if (messagesPergame.containsKey(gameId)) {
-                messagesPergame.get(gameId).add(message);
-            } else {
-                messagesPergame.put(gameId, new ArrayList<ChatMessage>());
-                messagesPergame.get(gameId).add(message);
-            }
-        }
-
-        for (String gameId : messagesPergame.keySet()) {
-            List<ChatMessage> messagesInGame = messagesPergame.get(gameId);
-            String gameMessages = jsonSerializer.toJson(messagesInGame);
-            saveGamePrefs.putString(gameId, gameMessages);
-        }
-
-        saveGamePrefs.flush();
-    }
-
-    @Override
-    public void saveCurrentUser(Player player) {
-        String playerJsonString = jsonSerializer.toJson(player);
+        String playerJsonString = jsonSerializer.writeValueAsString(player);
         userSave.putString("currentPlayer", playerJsonString);
         userSave.flush();
     }
 
     @Override
-    public void saveAccessToken(String token) {
-        userSave.putString("token", token);
+    public void saveAccessToken(AuthenticationResultType token) throws JsonProcessingException {
+        Preferences userSave = Gdx.app.getPreferences("userSave");
+
+        userSave.putString("token", jsonSerializer.writeValueAsString(token));
         userSave.flush();
     }
 
     @Override
-    public List<MultiplayerGame> getAllGames() {
+    public List<MultiplayerGame> getAllGames() throws IOException {
+        Preferences saveGamePrefs = Gdx.app.getPreferences("gameSave");
+
         String gamesJsonString = saveGamePrefs.getString("allGames");
-        List<MultiplayerGame> savedGames = jsonSerializer.fromJson(List.class, gamesJsonString);
 
-        return savedGames;
+        MultiplayerGame[] savedGames = jsonSerializer.readValue(gamesJsonString, MultiplayerGame[].class);
+
+        return Arrays.asList(savedGames);
     }
 
     @Override
-    public List<ChatMessage> getAllChatMessagesForGame(String gameId) {
-        String chatMessagesJsonString = chats.getString(gameId);
-        List<ChatMessage> savedGames = jsonSerializer.fromJson(List.class, chatMessagesJsonString);
+    public Player getCurrentUser() throws IOException {
+        Preferences userSave = Gdx.app.getPreferences("userSave");
 
-        return savedGames;
-    }
-
-    @Override
-    public Player getCurrentUser() {
         String playerJsonString = userSave.getString("currentPlayer");
-        Player player = jsonSerializer.fromJson(Player.class, playerJsonString);
+        Player player = jsonSerializer.readValue(playerJsonString, Player.class);
 
         return player;
     }
 
     @Override
-    public String getCurrentAccessToken() {
-        return userSave.getString("token");
+    public AuthenticationResultType getCurrentAccessToken() throws IOException {
+        Preferences userSave = Gdx.app.getPreferences("userSave");
+        return jsonSerializer.readValue(userSave.getString("token"), AuthenticationResultType.class);
     }
 }

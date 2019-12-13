@@ -1,0 +1,131 @@
+# This is the SAM template that represents the architecture of your serverless application
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
+
+# The AWSTemplateFormatVersion identifies the capabilities of the template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  API and DB setup for Dinos backend
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform: AWS::Serverless-2016-10-31
+
+# Shared configuration for all resources, more in
+# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+    #Function:
+    # The PermissionsBoundary allows users to safely develop with their function's permissions constrained
+    # to their current application. All the functions and roles in this application have to include it and
+    # it has to be manually updated when you add resources to your application.
+    # More information in https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html
+  Api:
+      Auth:
+        DefaultAuthorizer: DinoCognitoAutorizer
+        Authorizers:
+          DinoCognitoAutorizer:
+            UserPoolArn: 'arn:aws:cognito-idp:eu-central-1:848222475186:userpool/eu-central-1_Mu7zeWwhl' # needs to be dynamic
+            Identity: # OPTIONAL
+              Header: 'Authoriztion' # OPTIONAL; Default: 'Authorization'
+
+
+Parameters:
+  AppId:
+    Type: String
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+
+
+  friendApiHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/libs/backend-1.0.jar
+      Handler: com.tuxbear.dinos.backend.ProfileHandler
+      Runtime: java8
+      MemorySize: 128
+      Timeout: 60
+      Description: Handles Friend related API calls
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref playerTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          FriendsTable: !Ref playerTable
+          region: eu-central-1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /profile
+            Method: GET
+
+  newGameHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/libs/backend-1.0.jar
+      Handler: com.tuxbear.dinos.backend.NewGameHandler
+      Runtime: java8
+      MemorySize: 128
+      Timeout: 60
+      Description: Handles Game related API calls
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref gamesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref gamesTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          FriendsTable: !Ref gamesTable
+          region: eu-central-1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /new-game
+            Method: POST
+
+  # The table containing a users approved friends: Haskey: username, infotype: 'friendlist': friendUsernames: String[]
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
+
+  playerTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "username"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "username"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  gamesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "gameId"
+          AttributeType: "S"
+        -
+          AttributeName: "timestamp"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "gameId"
+          KeyType: "HASH"
+        -
+          AttributeName: "timestamp"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1

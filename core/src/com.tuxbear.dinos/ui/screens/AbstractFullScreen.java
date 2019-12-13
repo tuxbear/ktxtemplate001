@@ -15,6 +15,9 @@ public abstract class AbstractFullScreen extends AbstractScreen {
         rootTable = new Table();
         rootTable.setFillParent(true);
         stage.addActor(rootTable);
+        stage
+                .getRoot()
+                .setDebug(true);
     }
 
     @Override

@@ -4,8 +4,8 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
+import com.badlogic.gdx.utils.Align;
 import com.tuxbear.dinos.*;
 import com.tuxbear.dinos.domain.events.*;
 import com.tuxbear.dinos.domain.game.*;
@@ -14,8 +14,6 @@ import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.events.*;
 import com.tuxbear.dinos.ui.widgets.board.*;
 import com.tuxbear.dinos.ui.dialogs.*;
-
-import javax.annotation.Resource;
 
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 03/12/13 Time: 15:07 To change this template use File | Settings | File
@@ -40,8 +38,11 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         }
 
         this.dinosGameInstance = dinosGameInstance;
-        rootTable.setBackground(new SpriteDrawable(new Sprite(new Texture(Gdx.files.internal("scene.jpg")))));
 
+        rootTable.setDebug(true);
+        rootTable.align(Align.top);
+
+        rootTable.setBackground(new SpriteDrawable(new Sprite(new Texture(Gdx.files.internal("scene.jpg")))));
 
         float screenWidth = stage.getViewport().getScreenWidth();
         float tileSize = screenWidth / (dinosGameInstance.getBoard().getColumns() * 1.0f);
@@ -50,16 +51,12 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         statusBar = new RoundStatusBar(ResourceContainer.skin);
 
         Touchpad tp = new Touchpad(2f, ResourceContainer.skin);
+        tp.setResetOnTouchUp(true);
+        tp.setFillParent(true);
 
-        rootTable.add(statusBar).expandX().top();
-
+        rootTable.add(statusBar).height(boardWidget.tileSize).top();
         rootTable.row();
-
-        rootTable.add(boardWidget).expandY().padBottom(Value.percentHeight(0.05f));
-
-        rootTable.row();
-
-        rootTable.add(tp).bottom();
+        rootTable.add(boardWidget).top();
 
         eventBus.subscribe(this, MissionAccomplishedEvent.class);
 

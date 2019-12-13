@@ -1,6 +1,5 @@
 package com.tuxbear.dinos.ui.widgets.board;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.services.IoC;

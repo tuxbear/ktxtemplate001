@@ -33,7 +33,6 @@ public class RoundStatusBar extends Table implements GameEventListener{
 
         missionDinoImage = new Image();
 
-
         movesLabel = new Label("0", skin);
         timeLabel = new Label("00:00", skin);
         add(missionDinoImage);

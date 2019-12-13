@@ -1,7 +1,6 @@
 package com.tuxbear.dinos.services;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
