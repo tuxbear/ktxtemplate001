@@ -40,13 +40,13 @@ public class GameListWidget extends Table {
         for(final MultiplayerGame game : games) {
             row();
             long score = game.getTotalScoreForPlayer(currentPlayer);
-            int rank = game.getPlayerRank(currentPlayer.getId());
+            int rank = game.getPlayerRank(currentPlayer.getUsername());
             int currentMissionNumber = game.getCurrentMissionNumber();
             int numberOfMissions = game.getNumberOfMissions();
-            LocalGameState status = game.getLocalGameState(currentPlayer.getId());
+            LocalGameState status = game.getLocalGameState(currentPlayer.getUsername());
 
             add(String.format("#%s \n %sp", rank, score)).center();
-            add(String.format("vs %s", game.getOpponentString(currentPlayer.getId()))).center();
+            add(String.format("vs %s", game.getOpponentString(currentPlayer.getUsername()))).center();
             add(String.format("%s / %s", currentMissionNumber, numberOfMissions)).center();
             add(String.format("%s", status.prettyString())).center();
         }

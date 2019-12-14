@@ -8,6 +8,8 @@ import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.ui.widgets.controls.ValueCheckbox;
 import com.tuxbear.dinos.ui.widgets.controls.ValueCheckboxGroup;
 
+import java.io.IOException;
+
 
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 06/01/14 Time: 15:36 To change this template use File | Settings | File
@@ -15,7 +17,7 @@ import com.tuxbear.dinos.ui.widgets.controls.ValueCheckboxGroup;
  */
 public class CreateGameDialog extends AbstractCallbackDialog {
     private PlayerService playerService = IoC.resolve(PlayerService.class);
-    private GameService gameService = IoC.resolve(GameService.class);
+    private DataService dataService = IoC.resolve(DataService.class);
     private Logger logger = IoC.resolve(Logger.class);
 
 
@@ -73,26 +75,30 @@ public class CreateGameDialog extends AbstractCallbackDialog {
                 final LoadingDialog loadingDialog = new LoadingDialog(ResourceContainer.skin, "Creating game...");
                 loadingDialog.show(getStage());
 
-                gameService.createGameAsync(
-                        playerService.getCurrentPlayer().getId(),
-                        selectedFriendsGroup.getSelectedValues(),
-                        boardSelect.getSelection().toString(),
-                        9,
-                        difficultySelect.getSelection().toString(),
-                        new ServerCallback<MultiplayerGame>() {
-                            @Override
-                            public void processResult(MultiplayerGame result, ServerCallResults status) {
-                                if (status.getStatus() == ServerCallStatus.SUCCESS) {
-                                    hide();
-                                    loadingDialog.hide();
-                                    result(result);
-                                } else {
-                                    loadingDialog.hide();
-                                    logger.log(status.getFailureString());
+                try {
+                    dataService.createGameAsync(
+                            playerService.getCurrentPlayer().getUsername(),
+                            selectedFriendsGroup.getSelectedValues(),
+                            boardSelect.getSelection().toString(),
+                            9,
+                            difficultySelect.getSelection().toString(),
+                            new ServerCallback<MultiplayerGame>() {
+                                @Override
+                                public void processResult(MultiplayerGame result, ServerCallResults status) {
+                                    if (status.getStatus() == ServerCallStatus.SUCCESS) {
+                                        hide();
+                                        loadingDialog.hide();
+                                        result(result);
+                                    } else {
+                                        loadingDialog.hide();
+                                        logger.log(status.getFailureString());
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+                } catch (IOException e) {
+                    //TODO: notification and handling
+                }
             }
         });
 

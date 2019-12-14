@@ -10,11 +10,14 @@ dependencies {
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.0'
     implementation 'com.amazonaws:aws-lambda-java-events:2.2.7'
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.692'
-    implementation project(":domain")
+    implementation 'com.auth0:java-jwt:3.8.3'
 
+    implementation project(":domain")
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
 }
 
 sourceSets.main.kotlin.srcDirs = ['src/']
+sourceSets.test.kotlin.srcDirs = ['test/']
 
 
 sourceCompatibility = 1.8

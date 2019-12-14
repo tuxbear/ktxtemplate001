@@ -10,6 +10,6 @@ import com.tuxbear.dinos.domain.user.*;
 public class PlayerWidget extends Table {
     public PlayerWidget(Player player, Skin skin) {
         super(skin);
-        add(player.getId());
+        add(player.getUsername());
     }
 }

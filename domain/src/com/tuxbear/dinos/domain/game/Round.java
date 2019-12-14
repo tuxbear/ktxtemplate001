@@ -68,7 +68,7 @@ public class Round {
     }
 
     public MissionResult getResultForPlayer(Player user) {
-        return getResultForUsername(user.getId());
+        return getResultForUsername(user.getUsername());
     }
 
     public MissionResult getResultForUsername(String username) {

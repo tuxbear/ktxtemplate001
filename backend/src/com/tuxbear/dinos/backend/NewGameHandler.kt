@@ -24,3 +24,22 @@ class NewGameHandler : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayPro
         return apiGatewayProxyResponseEvent
     }
 }
+
+
+class GetActiveGamesHandler : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+    override fun handleRequest(input: APIGatewayProxyRequestEvent?, context: Context?): APIGatewayProxyResponseEvent {
+
+        val response = APIGatewayProxyResponseEvent()
+        val username = input?.requestContext?.identity?.cognitoIdentityId
+
+        if(username == null) {
+            response.statusCode = 400
+            response.body = "no username found"
+        } else {
+            // dynamo DB get users active game IDs
+            // BatchGetItem all active games and return them
+        }
+
+        return response
+    }
+}

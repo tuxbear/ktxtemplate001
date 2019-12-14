@@ -148,7 +148,7 @@ public class MultiplayerGame {
     public long getTotalScoreForPlayer(Player player) {
         long score = 0;
         for (MissionResult result : missionResults) {
-            if (result != null && result.getPlayerId().equals(player.getId())) {
+            if (result != null && result.getPlayerId().equals(player.getUsername())) {
                 score += result.getScore();
             }
         }
@@ -160,8 +160,8 @@ public class MultiplayerGame {
 
         List<String> playerNames = new ArrayList<>();
         for (Player player : players) {
-            if (!player.getId().equals(currentPlayerId)) {
-                playerNames.add(player.getId());
+            if (!player.getUsername().equals(currentPlayerId)) {
+                playerNames.add(player.getUsername());
             }
         }
 
@@ -177,7 +177,7 @@ public class MultiplayerGame {
     public boolean isMissionCompletedByAllPlayers(String missionId) {
 
         for (Player player : getPlayers()) {
-            MissionResult result = getMissionResultForPlayer(player.getId(), missionId);
+            MissionResult result = getMissionResultForPlayer(player.getUsername(), missionId);
             if (result == null) {
                 return false;
             }
@@ -228,7 +228,7 @@ public class MultiplayerGame {
         TreeSet sortedScores = new TreeSet();
         for (Player player : players) {
             long score = getTotalScoreForPlayer(player);
-            playerScores.put(player.getId(), score);
+            playerScores.put(player.getUsername(), score);
             sortedScores.add(score);
 
         }

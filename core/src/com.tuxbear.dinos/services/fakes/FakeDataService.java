@@ -5,9 +5,15 @@ import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
+import java.io.IOException;
 import java.util.*;
 
-public class FakeGameService implements GameService {
+public class FakeDataService implements DataService {
+    @Override
+    public void getPlayerProfile(ServerCallback<Player> responseCallback) throws IOException {
+        responseCallback.processResult(new Player(), ServerCallResults.success());
+    }
+
     @Override
     public void createGameAsync(String username, List<String> players, String board, int rounds, String difficulty,
                                 final ServerCallback<MultiplayerGame> responseCallback) {
@@ -62,7 +68,7 @@ public class FakeGameService implements GameService {
 
         Board board = Board.getByName("");
         Player me = new Player();
-        me.setId("eleni");
+        me.setUsername("eleni");
 
         MultiplayerGame multiplayerGame = new MultiplayerGame();
         multiplayerGame.getPlayers().add(me);

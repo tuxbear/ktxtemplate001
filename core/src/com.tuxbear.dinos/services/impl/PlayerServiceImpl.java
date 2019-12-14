@@ -16,7 +16,6 @@ public class PlayerServiceImpl implements PlayerService {
 
     LocalStorage storage = IoC.resolve(LocalStorage.class);
 
-
     @Override
     public Player login(String username, String password) {
         CognitoClient cognitoClient = new CognitoClient();
@@ -37,7 +36,7 @@ public class PlayerServiceImpl implements PlayerService {
         }
 
         Player player = new Player();
-        player.setId(username);
+        player.setUsername(username);
 
         return player;
 

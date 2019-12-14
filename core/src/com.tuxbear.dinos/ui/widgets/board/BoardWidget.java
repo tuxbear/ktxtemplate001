@@ -187,7 +187,7 @@ public class BoardWidget extends WidgetGroup {
             result.setMissionId(currentMission.getId());
             result.setMoveSequence(currentMoveSequence);
 
-            result.setPlayerId(playerService.getCurrentPlayer().getId());
+            result.setPlayerId(playerService.getCurrentPlayer().getUsername());
             game.reportResultForCurrentRound(result);
             eventBus.publishEvent(new MissionAccomplishedEvent(result));
         }

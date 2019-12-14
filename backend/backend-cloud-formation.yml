@@ -26,7 +26,7 @@ Globals:
           DinoCognitoAutorizer:
             UserPoolArn: 'arn:aws:cognito-idp:eu-central-1:848222475186:userpool/eu-central-1_Mu7zeWwhl' # needs to be dynamic
             Identity: # OPTIONAL
-              Header: 'Authoriztion' # OPTIONAL; Default: 'Authorization'
+              Header: 'Authorization' # OPTIONAL; Default: 'Authorization'
 
 
 Parameters:
@@ -39,16 +39,14 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-
-
   friendApiHandler:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: build/libs/backend-1.0.jar
       Handler: com.tuxbear.dinos.backend.ProfileHandler
       Runtime: java8
-      MemorySize: 128
-      Timeout: 60
+      MemorySize: 168
+      Timeout: 30
       Description: Handles Friend related API calls
       Policies:
         - DynamoDBCrudPolicy:
@@ -56,7 +54,7 @@ Resources:
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          FriendsTable: !Ref playerTable
+          playerTable: !Ref playerTable
           region: eu-central-1
       Events:
         Api:
@@ -71,18 +69,19 @@ Resources:
       CodeUri: build/libs/backend-1.0.jar
       Handler: com.tuxbear.dinos.backend.NewGameHandler
       Runtime: java8
-      MemorySize: 128
-      Timeout: 60
+      MemorySize: 256
+      Timeout: 30
       Description: Handles Game related API calls
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref gamesTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref gamesTable
+            TableName: !Ref playerTable
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          FriendsTable: !Ref gamesTable
+          playerTable: !Ref playerTable
+          gamesTable: !Ref gamesTable
           region: eu-central-1
       Events:
         Api:

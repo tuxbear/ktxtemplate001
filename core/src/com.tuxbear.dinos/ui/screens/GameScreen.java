@@ -15,6 +15,8 @@ import com.tuxbear.dinos.services.events.*;
 import com.tuxbear.dinos.ui.widgets.board.*;
 import com.tuxbear.dinos.ui.dialogs.*;
 
+import java.io.IOException;
+
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 03/12/13 Time: 15:07 To change this template use File | Settings | File
  * Templates.
@@ -25,7 +27,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
     private RoundStatusBar statusBar;
     private EventBus eventBus = IoC.resolve(EventBus.class);
     private PlayerService playerService = IoC.resolve(PlayerService.class);
-    private GameService gameService = IoC.resolve(GameService.class);
+    private DataService dataService = IoC.resolve(DataService.class);
     private Logger logger = IoC.resolve(Logger.class);
 
     private MultiplayerGame dinosGameInstance;
@@ -65,7 +67,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
     private void initGameUI() {
         Player currentPlayer = playerService.getCurrentPlayer();
-        switch (dinosGameInstance.getLocalGameState(currentPlayer.getId())) {
+        switch (dinosGameInstance.getLocalGameState(currentPlayer.getUsername())) {
             case WAITING_FOR_OPPONENTS:
                 showMissionAccomplishedDialog();
                 break;
@@ -117,19 +119,20 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
             MissionAccomplishedEvent missionEvent = (MissionAccomplishedEvent) event;
             final LoadingDialog sendingDialog = new LoadingDialog(ResourceContainer.skin, "Sending result...");
             sendingDialog.show(stage);
-            gameService.reportRoundResultsAsync(missionEvent.getResult(), new ServerCallback<MultiplayerGame>() {
-                @Override
-                public void processResult(MultiplayerGame result, ServerCallResults status) {
-                    sendingDialog.hide();
+            try {
+                dataService.reportRoundResultsAsync(missionEvent.getResult(), new ServerCallback<MultiplayerGame>() {
+                    @Override
+                    public void processResult(MultiplayerGame result, ServerCallResults status) {
+                        sendingDialog.hide();
 
-                }
-            });
-
+                    }
+                });
+            } catch (IOException e) {
+                //TODO: handle breakdown in comms somehow, store to localstorage and sync later?
+            }
 
             showMissionAccomplishedDialog();
-
         }
-
     }
 
     private void showMissionAccomplishedDialog() {

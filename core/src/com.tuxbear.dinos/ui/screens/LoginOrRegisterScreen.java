@@ -6,18 +6,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tuxbear.dinos.DinosGame;
+import com.tuxbear.dinos.services.DataService;
 import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.PlayerService;
 import com.tuxbear.dinos.services.ResourceContainer;
 
+import java.io.IOException;
+
 public class LoginOrRegisterScreen extends AbstractFullScreen {
-
     PlayerService playerService = IoC.resolve(PlayerService.class);
-
+    DataService dataService = IoC.resolve(DataService.class);
 
     TextField usernameTextField = new TextField("", ResourceContainer.skin);
     TextField passwordTextField = new TextField("", ResourceContainer.skin);
-
 
     public LoginOrRegisterScreen(DinosGame game) {
         super(game);
@@ -55,7 +56,17 @@ public class LoginOrRegisterScreen extends AbstractFullScreen {
 
                 playerService.login(usernameTextField.getText(), passwordTextField.getText());
 
-                game.setScreen(new GameListScreen(game));
+                try {
+                    dataService.getPlayerProfile((result, status) -> {
+                        System.out.println("Hello " + result.getUsername());
+                        game.setScreen(new GameListScreen(game));
+                    });
+                } catch (IOException e) {
+                    // TODO: Handle comms breakdown?
+                    e.printStackTrace();
+                }
+
+
             }
         });
 

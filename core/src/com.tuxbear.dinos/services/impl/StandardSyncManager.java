@@ -3,6 +3,7 @@ package com.tuxbear.dinos.services.impl;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -11,16 +12,16 @@ import java.util.*;
 public class StandardSyncManager implements SyncManager {
 
     private LocalStorage localStorage;
-    private GameService gameService;
+    private DataService dataService;
 
-    public StandardSyncManager(LocalStorage localStorage, GameService gameService) {
+    public StandardSyncManager(LocalStorage localStorage, DataService dataService) {
 
         this.localStorage = localStorage;
-        this.gameService = gameService;
+        this.dataService = dataService;
     }
 
     @Override
-    public void syncLocalStorageWithRemote(Runnable callback) {
+    public void syncLocalStorageWithRemote(Runnable callback) throws IOException {
 
 
         // detect if storage is empty
@@ -35,12 +36,12 @@ public class StandardSyncManager implements SyncManager {
         callback.run();
     }
 
-    private void doIcrementalUpdate() {
+    private void doIcrementalUpdate() throws IOException {
 
         // get date of last update
         Date dateOfLastUpdate = new Date();
 
-        gameService.getUpdatesAsync(dateOfLastUpdate, new ServerCallback<GameEventUpdatesResponse>() {
+        dataService.getUpdatesAsync(dateOfLastUpdate, new ServerCallback<GameEventUpdatesResponse>() {
             @Override
             public void processResult(GameEventUpdatesResponse result, ServerCallResults status) {
                 // save results

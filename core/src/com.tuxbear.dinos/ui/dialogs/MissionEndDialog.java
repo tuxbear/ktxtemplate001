@@ -63,7 +63,7 @@ public class MissionEndDialog extends AbstractCallbackDialog {
         button("Review", "review");
 
         Player currentPlayer = playerService.getCurrentPlayer();
-        LocalGameState gameState = game.getLocalGameState(currentPlayer.getId());
+        LocalGameState gameState = game.getLocalGameState(currentPlayer.getUsername());
         if (gameState == LocalGameState.YOU_CAN_PLAY || gameState == LocalGameState.WAITING_JUST_FOR_YOU) {
             button("Next mission", "next");
         }

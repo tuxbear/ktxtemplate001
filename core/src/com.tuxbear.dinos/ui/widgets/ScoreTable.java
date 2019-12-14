@@ -38,7 +38,7 @@ public class ScoreTable extends Table {
         for(Player player : game.getPlayers()) {
 
             row();
-            MissionResult roundResults = game.getMissionResultForPlayer(player.getId(), missionToShowResultsFor.getId());
+            MissionResult roundResults = game.getMissionResultForPlayer(player.getUsername(), missionToShowResultsFor.getId());
 
             add(new PlayerWidget(player, skin)).expandX().center();
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import com.tuxbear.dinos.services.events.*;
 import com.tuxbear.dinos.services.impl.*;
-import com.tuxbear.dinos.services.impl.aws.AWSGameService;
+import com.tuxbear.dinos.services.impl.aws.AWSDataService;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ public class IoC {
         singletons.put(EventBus.class, new EventBusImpl());
         singletons.put(LocalStorage.class, new LocalStorageImpl());
         singletons.put(PlayerService.class, new PlayerServiceImpl());
-        singletons.put(GameService.class, new AWSGameService());
+        singletons.put(DataService.class, new AWSDataService());
 
     }
 

@@ -3,18 +3,17 @@ package com.tuxbear.dinos.services.impl.aws;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.net.*;
 import com.badlogic.gdx.utils.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.Logger;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 07/01/14 Time: 15:02 To change this template use File | Settings | File
- * Templates.
- */
+import java.io.IOException;
+
 public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
 
     private final ServerCallback<T> callback;
     private final Class<T> returnType;
-    private final Json jsonSerializer = IoC.resolve(Json.class);
+    private final ObjectMapper jsonSerializer = IoC.resolve(ObjectMapper.class);
     private final Logger logger = IoC.resolve(Logger.class);
 
     public ServerCallbackAdapter(Class<T> returnType, ServerCallback<T> callback) {
@@ -26,13 +25,12 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
         logger.log("Recevied remote response: " + httpResponse.toString());
         if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-            final T receivedObject = jsonSerializer.fromJson(returnType, httpResponse.getResultAsString());
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    callback.processResult(receivedObject, ServerCallResults.success());
-                }
-            });
+            try {
+                final T receivedObject = jsonSerializer.readValue(httpResponse.getResultAsString(), returnType);
+                Gdx.app.postRunnable(() -> callback.processResult(receivedObject, ServerCallResults.success()));
+            } catch (IOException e) {
+                callbackWithFailure("failed to deserialize: " + e.getMessage());
+            }
         } else {
             callbackWithFailure(httpResponse.getResultAsString());
         }

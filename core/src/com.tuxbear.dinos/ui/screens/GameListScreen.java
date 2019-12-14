@@ -9,15 +9,15 @@ import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.ui.dialogs.*;
 import com.tuxbear.dinos.ui.widgets.*;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by Ole - André Johansen on 05.01.14.
  */
 public class GameListScreen extends AbstractFullScreen {
 
-    private GameService gameService = IoC.resolve(GameService.class);
+    private DataService dataService = IoC.resolve(DataService.class);
     private PlayerService playerService = IoC.resolve(PlayerService.class);
 
     private final GameListWidget gameListWidget;
@@ -68,11 +68,15 @@ public class GameListScreen extends AbstractFullScreen {
     private void refreshGameList() {
         loadingGamesProgressDialog.show(stage);
 
-        gameService.getActiveGamesForPlayerAsync(playerService.getCurrentPlayer(), (result, status) -> {
-            dinoGames = new ArrayList<>(result);
-            gameListWidget.setGameList(dinoGames);
-            rootTable.invalidateHierarchy();
-            loadingGamesProgressDialog.hide();
-        });
+        try {
+            dataService.getActiveGamesForPlayerAsync(playerService.getCurrentPlayer(), (result, status) -> {
+                dinoGames = new ArrayList<>(result);
+                gameListWidget.setGameList(dinoGames);
+                rootTable.invalidateHierarchy();
+                loadingGamesProgressDialog.hide();
+            });
+        } catch (IOException e) {
+            // TODO: error notification and handling
+        }
     }
 }
