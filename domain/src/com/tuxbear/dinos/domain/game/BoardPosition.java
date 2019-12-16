@@ -1,16 +1,21 @@
 package com.tuxbear.dinos.domain.game;
 
-public class BoardPosition {
-    public int x;
-    public int y;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 
-    public static BoardPosition OFF_BOARD = new BoardPosition(-1000,-1000);
+@DynamoDBDocument
+public class BoardPosition {
+
+    public static BoardPosition OFF_BOARD = new BoardPosition(-1000, -1000);
+    @DynamoDBAttribute
+    public int x;
+    @DynamoDBAttribute
+    public int y;
 
     public BoardPosition() {
     }
 
     public BoardPosition(int x, int y) {
-        //To change body of created methods use File | Settings | File Templates.
         this.x = x;
         this.y = y;
     }
@@ -23,26 +28,25 @@ public class BoardPosition {
     public BoardPosition getPositionInDirection(Direction direction) {
         switch (direction) {
             case Up:
-                    return new BoardPosition(x,y-1);
+                return new BoardPosition(x, y - 1);
             case Down:
-                return new BoardPosition(x,y+1);
+                return new BoardPosition(x, y + 1);
             case Left:
-                return new BoardPosition(x-1,y);
+                return new BoardPosition(x - 1, y);
             case Right:
-                return new BoardPosition(x+1,y);
+                return new BoardPosition(x + 1, y);
             default:
                 throw new IllegalArgumentException("inDirection");
         }
     }
 
-    public int getDistanceTo(BoardPosition position){
-        return Math.abs(x-position.x + y - position.y);
+    public int getDistanceTo(BoardPosition position) {
+        return Math.abs(x - position.x + y - position.y);
     }
 
     @Override
-    public boolean equals(Object other)
-    {
-        return other instanceof BoardPosition && equals((BoardPosition)other);
+    public boolean equals(Object other) {
+        return other instanceof BoardPosition && equals((BoardPosition) other);
     }
 
     public boolean equals(BoardPosition other) {
@@ -50,15 +54,22 @@ public class BoardPosition {
     }
 
     public String toString() {
-        return String.format("(%s,%s)", x,y);
+        return String.format("(%s,%s)", x, y);
     }
-
 
     public int getX() {
         return x;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
     public int getY() {
         return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 }

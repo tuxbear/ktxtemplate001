@@ -4,11 +4,11 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.net.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuxbear.dinos.domain.dto.requests.GameRequest;
 import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
-import com.tuxbear.dinos.services.impl.aws.requests.GameRequest;
-import com.tuxbear.dinos.services.impl.aws.requests.NewGameRequest;
+import com.tuxbear.dinos.domain.dto.requests.NewGameRequest;
 import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
 import java.io.IOException;
@@ -16,11 +16,11 @@ import java.util.*;
 
 public class AWSDataService implements DataService {
 
-    String getPlayerProfileEndpoint = "https://c5kr85odi9.execute-api.eu-central-1.amazonaws.com/Prod/profile";
 
-    String endpointBaseUrl = "http://dinos.azurewebsites.net/api/multiplayerapi";
+    String endpointBaseUrl = "https://c5kr85odi9.execute-api.eu-central-1.amazonaws.com/Prod";
 
-    String createGameUrl = endpointBaseUrl + "/startgame";
+    String getPlayerProfileEndpoint = endpointBaseUrl + "/profile";
+    String createGameUrl = endpointBaseUrl + "/new-game";
     String getGameUrl = endpointBaseUrl + "/getGame";
     String getActiveGamesForUserUrl = endpointBaseUrl + "/getactivegames";
     String reportMissionResultUrl = endpointBaseUrl + "/ReportMissionResult";
@@ -46,21 +46,23 @@ public class AWSDataService implements DataService {
     public void createGameAsync(String username, List<String> players, String board, int rounds, String difficulty,
                                            final ServerCallback<MultiplayerGame> responseCallback) throws IOException {
 
-        NewGameRequest createGameRequest = new NewGameRequest(username, board, players, rounds, difficulty);
+        NewGameRequest createGameRequest = new NewGameRequest(board, players, rounds, difficulty);
         Net.HttpRequest request = createHttpPostRequest(createGameUrl, createGameRequest);
         netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(MultiplayerGame.class, responseCallback));
     }
 
     @Override
     public void getGameByIdAsync(String id, final ServerCallback<MultiplayerGame> responseCallback) throws IOException {
-        com.tuxbear.dinos.services.impl.aws.requests.GameRequest getGameRequest = new GameRequest(id);
+        GameRequest getGameRequest = new GameRequest(id);
         Net.HttpRequest request = createHttpPostRequest(createGameUrl, getGameRequest);
         netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(MultiplayerGame.class, responseCallback));
     }
 
     @Override
     public void getActiveGamesForPlayerAsync(Player player, final ServerCallback<List<MultiplayerGame>> responseCallback) throws IOException {
-        com.tuxbear.dinos.services.impl.aws.requests.ActiveGameListRequest getActiveGamesRequest = new com.tuxbear.dinos.services.impl.aws.requests.ActiveGameListRequest(player.getUsername());
+        responseCallback.processResult(new ArrayList<>(), ServerCallResults.success());
+/*
+        ActiveGameListRequest getActiveGamesRequest = new ActiveGameListRequest(player.getUsername());
         Net.HttpRequest request = createHttpPostRequest(getActiveGamesForUserUrl, getActiveGamesRequest);
         netClient.sendHttpRequest(request, new Net.HttpResponseListener() {
             @Override
@@ -86,7 +88,7 @@ public class AWSDataService implements DataService {
             public void cancelled() {
 
             }
-        });
+        });*/
     }
 
 

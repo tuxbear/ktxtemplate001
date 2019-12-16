@@ -1,6 +1,31 @@
 package com.tuxbear.dinos.domain.game;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+
+@DynamoDBDocument
 public class MissionResult {
+
+    @DynamoDBAttribute
+    private String gameId;
+
+    @DynamoDBAttribute
+    private String playerId;
+
+    @DynamoDBAttribute
+    private String missionId;
+
+    @DynamoDBAttribute
+    private MoveSequence moveSequence;
+
+    @DynamoDBAttribute
+    private int score;
+
+    @DynamoDBAttribute
+    private int millisecondsSpent;
+
+    @DynamoDBAttribute
+    private int numberOfMoves;
 
     public MissionResult() {
     }
@@ -44,15 +69,6 @@ public class MissionResult {
     public void setNumberOfMoves(int numberOfMoves) {
         this.numberOfMoves = numberOfMoves;
     }
-
-    private String gameId;
-    private String playerId;
-    private String missionId;
-    private MoveSequence moveSequence;
-    private int score;
-    private int millisecondsSpent;
-    private int numberOfMoves;
-
 
     public String getMissionId() {
         return missionId;

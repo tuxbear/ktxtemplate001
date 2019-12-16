@@ -188,7 +188,10 @@ public class BoardWidget extends WidgetGroup {
             result.setMoveSequence(currentMoveSequence);
 
             result.setPlayerId(playerService.getCurrentPlayer().getUsername());
-            game.reportResultForCurrentRound(result);
+
+            game.reportResultForCurrentRound(result)
+                    .forEach(eventBus::publishEvent);
+
             eventBus.publishEvent(new MissionAccomplishedEvent(result));
         }
     }

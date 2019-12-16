@@ -50,8 +50,7 @@ public class FakeDataService implements DataService {
 
     }
 
-    private Mission generateRound_DELETE_ME(int number, int dino, int x, int y) {
-
+    public static Mission generateRound_DELETE_ME(int number, int dino, int x, int y) {
         Mission mission = new Mission();
         mission.setPieceNumber(dino);
         mission.setPosition(new BoardPosition(x, y));
@@ -60,7 +59,7 @@ public class FakeDataService implements DataService {
         return mission;
     }
 
-    private MultiplayerGame generateGame_DELETE_ME(int rounds, int walls) {
+    public static MultiplayerGame generateGame_DELETE_ME(int rounds, int walls) {
         int rows = 10;
         int columns = 8;
 
@@ -114,13 +113,10 @@ public class FakeDataService implements DataService {
             missionList.add(generateRound_DELETE_ME(i + 1, dino, pos.x, pos.y));
         }
 
-
         multiplayerGame.setMissions(missionList);
         multiplayerGame.setCurrentMissionNumber(1);
         multiplayerGame.setId(UUID.randomUUID().toString());
 
         return multiplayerGame;
     }
-
-
 }

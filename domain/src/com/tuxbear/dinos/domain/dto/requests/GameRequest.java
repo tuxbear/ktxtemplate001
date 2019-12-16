@@ -1,9 +1,5 @@
-package com.tuxbear.dinos.services.impl.aws.requests;
+package com.tuxbear.dinos.domain.dto.requests;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 07/01/14 Time: 16:56 To change this template use File | Settings | File
- * Templates.
- */
 public class GameRequest {
 
     private String id;

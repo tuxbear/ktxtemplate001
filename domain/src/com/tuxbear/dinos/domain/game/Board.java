@@ -1,20 +1,59 @@
 package com.tuxbear.dinos.domain.game;
 
-import java.util.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedJson;
 
-/**
- * Created by Ole - André Johansen on 02.01.14.
- */
+import java.util.ArrayList;
+import java.util.List;
+
+@DynamoDBDocument
 public class Board {
 
+    @DynamoDBAttribute
     private String name;
+
+    @DynamoDBAttribute
     private int rows;
+
+    @DynamoDBAttribute
     private int columns;
 
-    List<Wall> walls = new ArrayList<>();
+    @DynamoDBAttribute
+    private List<Wall> walls = new ArrayList<>();
 
-    public void addWall(int fromX, int fromY, int toX, int toY){
-        walls.add(new Wall( fromX, fromY, toX, toY));
+    public static Board getByName(String name) {
+        int rows = 10;
+        int columns = 8;
+
+        Board board = new Board();
+        board.setColumns(columns);
+        board.setRows(rows);
+
+        board.addWall(0, 8, 0, 7);
+        board.addWall(2, 9, 3, 9);
+        board.addWall(5, 9, 6, 9);
+        board.addWall(3, 8, 3, 7);
+        board.addWall(2, 7, 3, 7);
+        board.addWall(7, 7, 7, 6);
+        board.addWall(5, 6, 6, 6);
+        board.addWall(5, 6, 5, 5);
+        board.addWall(1, 5, 1, 4);
+        board.addWall(1, 4, 2, 4);
+        board.addWall(3, 3, 4, 3);
+        board.addWall(4, 4, 4, 3);
+        board.addWall(0, 3, 0, 2);
+        board.addWall(7, 3, 7, 2);
+        board.addWall(1, 0, 2, 0);
+        board.addWall(4, 0, 5, 0);
+
+        return board;
+
+    }
+
+    public void addWall(int fromX, int fromY, int toX, int toY) {
+        walls.add(new Wall(fromX, fromY, toX, toY));
     }
 
     public List<Wall> getWalls() {
@@ -41,11 +80,10 @@ public class Board {
         this.rows = rows;
     }
 
-
+    @DynamoDBIgnore
     public boolean isInsideBoard(int targetX, int targetY) {
         return targetX >= 0 && targetX < columns && targetY >= 0 && targetY < rows;
     }
-
 
     private boolean canMove(int fromX, int fromY, Direction inDirection, List<BoardPosition> occupiedPositions) {
         int targetX = fromX,
@@ -105,11 +143,10 @@ public class Board {
         return new BoardPosition(targetX, targetY);
     }
 
-
     private boolean wallExistsBetween(int x1, int y1, int x2, int y2) {
-        for(Wall w : walls) {
-            if  ((w.getFrom().x == x1 && w.getFrom().y == y1 && w.getTo().x == x2 && w.getTo().y == y2) ||
-                    (w.getFrom().x == x2 && w.getFrom().y == y2 && w.getTo().x == x1 && w.getTo().y == y1)){
+        for (Wall w : walls) {
+            if ((w.getFrom().x == x1 && w.getFrom().y == y1 && w.getTo().x == x2 && w.getTo().y == y2) ||
+                    (w.getFrom().x == x2 && w.getFrom().y == y2 && w.getTo().x == x1 && w.getTo().y == y1)) {
                 return true;
             }
         }
@@ -118,7 +155,7 @@ public class Board {
     }
 
     private boolean hasDino(int x, int y, List<BoardPosition> dinoPositions) {
-        BoardPosition targetPosition = new BoardPosition(x,y);
+        BoardPosition targetPosition = new BoardPosition(x, y);
         return dinoPositions.contains(targetPosition);
     }
 
@@ -128,36 +165,6 @@ public class Board {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-
-    public static Board getByName(String name){
-        int rows = 10;
-        int columns = 8;
-
-        Board board = new Board();
-        board.setColumns(columns);
-        board.setRows(rows);
-
-        board.addWall(0,8, 0,7);
-        board.addWall(2,9, 3,9);
-        board.addWall(5,9, 6,9);
-        board.addWall(3,8, 3,7);
-        board.addWall(2,7, 3,7);
-        board.addWall(7,7, 7,6);
-        board.addWall(5,6, 6,6);
-        board.addWall(5,6, 5,5);
-        board.addWall(1,5, 1,4);
-        board.addWall(1,4, 2,4);
-        board.addWall(3,3, 4,3);
-        board.addWall(4,4, 4,3);
-        board.addWall(0,3, 0,2);
-        board.addWall(7,3, 7,2);
-        board.addWall(1,0, 2,0);
-        board.addWall(4,0, 5,0);
-
-        return board;
-
     }
 
 }

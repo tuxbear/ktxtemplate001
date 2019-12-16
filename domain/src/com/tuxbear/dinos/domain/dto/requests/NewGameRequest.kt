@@ -1,9 +1,18 @@
-package com.tuxbear.dinos.services.impl.aws.requests
+package com.tuxbear.dinos.domain.dto.requests
 
-data class NewGameRequest(
-        var username: String,
-        var board: String,
-        var selectedFriends: List<String>,
-        var rounds: Int,
-        var difficulty: String
-)
+class NewGameRequest {
+
+    lateinit var board: String
+    lateinit var selectedFriends: List<String>
+    var rounds: Int = 0
+    lateinit var difficulty: String
+
+    constructor()
+
+    constructor(board: String, selectedFriends: List<String>, rounds: Int, difficulty: String) {
+        this.board = board
+        this.selectedFriends = selectedFriends
+        this.rounds = rounds
+        this.difficulty = difficulty
+    }
+}

@@ -65,8 +65,6 @@ public class LoginOrRegisterScreen extends AbstractFullScreen {
                     // TODO: Handle comms breakdown?
                     e.printStackTrace();
                 }
-
-
             }
         });
 

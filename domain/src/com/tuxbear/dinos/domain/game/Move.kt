@@ -1,10 +1,19 @@
 package com.tuxbear.dinos.domain.game
 
-data class Move(
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument
+
+@DynamoDBDocument
+class Move(
         /**
          * The timestamp in system time for when the move was made
          */
-        val timestamp: Long,
-        val pieceNumber: Int,
-        val direction: Direction
+        @DynamoDBAttribute
+        var timestamp: Long,
+
+        @DynamoDBAttribute
+        var pieceNumber: Int,
+
+        @DynamoDBAttribute
+        var direction: Direction
 )

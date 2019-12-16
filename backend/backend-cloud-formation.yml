@@ -90,6 +90,33 @@ Resources:
             Path: /new-game
             Method: POST
 
+  getActiveGamesHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/libs/backend-1.0.jar
+      Handler: com.tuxbear.dinos.backend.GetActiveGamesHandler
+      Runtime: java8
+      MemorySize: 168
+      Timeout: 30
+      Description: Handles Game related API calls
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref gamesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref playerTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          playerTable: !Ref playerTable
+          gamesTable: !Ref gamesTable
+          region: eu-central-1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /active-games
+            Method: GET
+
   # The table containing a users approved friends: Haskey: username, infotype: 'friendlist': friendUsernames: String[]
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
 
@@ -113,14 +140,14 @@ Resources:
     Properties:
       AttributeDefinitions:
         -
-          AttributeName: "gameId"
+          AttributeName: "id"
           AttributeType: "S"
         -
           AttributeName: "timestamp"
           AttributeType: "S"
       KeySchema:
         -
-          AttributeName: "gameId"
+          AttributeName: "id"
           KeyType: "HASH"
         -
           AttributeName: "timestamp"

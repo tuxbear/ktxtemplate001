@@ -1,13 +1,22 @@
 package com.tuxbear.dinos.domain.game;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+
+@DynamoDBDocument
 public class Mission {
+
+    @DynamoDBAttribute
+    int pieceNumber;
+
+    @DynamoDBAttribute
+    BoardPosition position;
+
+    @DynamoDBAttribute
+    private String id;
 
     public Mission() {
     }
-
-    private String id;
-
-    private int shortestPath;
 
     public int getPieceNumber() {
         return pieceNumber;
@@ -17,34 +26,12 @@ public class Mission {
         this.pieceNumber = pieceNumber;
     }
 
-    int pieceNumber;
-
     public BoardPosition getPosition() {
         return position;
     }
 
     public void setPosition(BoardPosition position) {
         this.position = position;
-    }
-
-    BoardPosition position;
-
-    private MoveSequence solution;
-
-    public MoveSequence getSolution() {
-        return solution;
-    }
-
-    public void setSolution(MoveSequence solution) {
-        this.solution = solution;
-    }
-
-    public int getShortestPath() {
-        return shortestPath;
-    }
-
-    public void setShortestPath(int shortestPath) {
-        this.shortestPath = shortestPath;
     }
 
     public String getId() {

@@ -1,32 +1,76 @@
 package com.tuxbear.dinos.domain.game;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedJson;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tuxbear.dinos.domain.events.GameEvent;
 import com.tuxbear.dinos.domain.events.GameOverEvent;
 import com.tuxbear.dinos.domain.events.RoundEndEvent;
-import com.tuxbear.dinos.domain.user.Player;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
+@DynamoDBTable(tableName = "gamesTable")
 public class MultiplayerGame {
 
+    @DynamoDBHashKey
     private String id;
-    private String owner;
-    private String state;
-    private Integer version;
-    private int currentMissionNumber = 1;
-    private ArrayList<Mission> missions = new ArrayList<>();
-    private ArrayList<MissionResult> missionResults = new ArrayList<>();
-    private String difficulty;
-    private Board board;
-    private HashMap<Integer, BoardPosition> initialPiecePositions = new HashMap<>();
-    private ArrayList<Player> players = new ArrayList<>();
 
-    private Date lastUpdateFromServer;
+    @DynamoDBAttribute
+    private Date created;
+
+    @DynamoDBAttribute
+    private String owner;
+
+    @DynamoDBTypeConvertedEnum
+    private GlobalGameState state;
+
+    @DynamoDBVersionAttribute
+    private Integer version;
+
+    @DynamoDBAttribute
+    private int currentMissionNumber = 1;
+
+    @DynamoDBAttribute
+    private List<Mission> missions = new ArrayList<>();
+
+    @DynamoDBAttribute
+    private List<MissionResult> missionResults = new ArrayList<>();
+
+    @DynamoDBAttribute
+    private String difficulty;
+
+    @DynamoDBAttribute
+    private Board board;
+
+    @DynamoDBTypeConvertedJson
+    @DynamoDBAttribute
+    private Map<Integer, BoardPosition> initialPiecePositions = new HashMap<>();
+
+    @DynamoDBAttribute
+    private Set<String> players = new HashSet<>();
+
+    @DynamoDBAttribute
+    private Date lastUpdated;
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
     public Integer getVersion() {
         return version;
@@ -36,11 +80,11 @@ public class MultiplayerGame {
         this.version = version;
     }
 
-    public String getState() {
+    public GlobalGameState getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(GlobalGameState state) {
         this.state = state;
     }
 
@@ -60,12 +104,14 @@ public class MultiplayerGame {
         this.id = id;
     }
 
-    public GlobalGameState getGlobalGameState() {
+    @DynamoDBIgnore
+    public GlobalGameState calculateGlobalGameState() {
         return currentMissionNumber > getNumberOfMissions() ? GlobalGameState.ENDED : GlobalGameState.ACTIVE;
     }
 
+    @DynamoDBIgnore
     public LocalGameState getLocalGameState(String username) {
-        GlobalGameState globalState = getGlobalGameState();
+        GlobalGameState globalState = calculateGlobalGameState();
         if (globalState == GlobalGameState.ENDED || globalState == GlobalGameState.ABORTED) {
             return LocalGameState.ENDED;
         }
@@ -103,24 +149,27 @@ public class MultiplayerGame {
         return initialPiecePositions;
     }
 
-    public void setInitialPiecePositions(HashMap<Integer, BoardPosition> initialPiecePositions) {
+    public void setInitialPiecePositions(Map<Integer, BoardPosition> initialPiecePositions) {
         this.initialPiecePositions = initialPiecePositions;
     }
 
-    public ArrayList<Player> getPlayers() {
+    public Set<String> getPlayers() {
         return players;
     }
 
-    public void setPlayers(ArrayList<Player> players) {
+    public void setPlayers(Set<String> players) {
         this.players = players;
     }
 
+    @JsonIgnore
+    @DynamoDBIgnore
     public Mission getCurrentMission() {
         return missions.get(getCurrentMissionNumber() - 1);
     }
 
     /**
      * applies a mission result to the game and returns the resulting Game Events
+     *
      * @param result
      * @return
      */
@@ -145,10 +194,10 @@ public class MultiplayerGame {
         return events;
     }
 
-    public long getTotalScoreForPlayer(Player player) {
+    public long getTotalScoreForPlayer(String player) {
         long score = 0;
         for (MissionResult result : missionResults) {
-            if (result != null && result.getPlayerId().equals(player.getUsername())) {
+            if (result != null && result.getPlayerId().equals(player)) {
                 score += result.getScore();
             }
         }
@@ -157,11 +206,10 @@ public class MultiplayerGame {
     }
 
     public String getOpponentString(String currentPlayerId) {
-
         List<String> playerNames = new ArrayList<>();
-        for (Player player : players) {
-            if (!player.getUsername().equals(currentPlayerId)) {
-                playerNames.add(player.getUsername());
+        for (String player : players) {
+            if (!player.equals(currentPlayerId)) {
+                playerNames.add(player);
             }
         }
 
@@ -175,9 +223,8 @@ public class MultiplayerGame {
 
 
     public boolean isMissionCompletedByAllPlayers(String missionId) {
-
-        for (Player player : getPlayers()) {
-            MissionResult result = getMissionResultForPlayer(player.getUsername(), missionId);
+        for (String player : getPlayers()) {
+            MissionResult result = getMissionResultForPlayer(player, missionId);
             if (result == null) {
                 return false;
             }
@@ -195,6 +242,8 @@ public class MultiplayerGame {
         return null;
     }
 
+    @DynamoDBIgnore
+    @JsonIgnore
     public int getNumberOfMissions() {
         return missions.size();
     }
@@ -207,28 +256,28 @@ public class MultiplayerGame {
         this.currentMissionNumber = currentMissionNumber;
     }
 
-    public ArrayList<Mission> getMissions() {
+    public List<Mission> getMissions() {
         return missions;
     }
 
-    public void setMissions(ArrayList<Mission> missions) {
+    public void setMissions(List<Mission> missions) {
         this.missions = missions;
     }
 
-    public ArrayList<MissionResult> getMissionResults() {
+    public List<MissionResult> getMissionResults() {
         return missionResults;
     }
 
-    public void setMissionResults(ArrayList<MissionResult> missionResults) {
+    public void setMissionResults(List<MissionResult> missionResults) {
         this.missionResults = missionResults;
     }
 
     public int getPlayerRank(String playerId) {
         HashMap<String, Long> playerScores = new HashMap<>();
         TreeSet sortedScores = new TreeSet();
-        for (Player player : players) {
+        for (String player : players) {
             long score = getTotalScoreForPlayer(player);
-            playerScores.put(player.getUsername(), score);
+            playerScores.put(player, score);
             sortedScores.add(score);
 
         }
@@ -238,11 +287,11 @@ public class MultiplayerGame {
         return new ArrayList(sortedScores).indexOf(playerScore) + 1;
     }
 
-    public Date getLastUpdateFromServer() {
-        return lastUpdateFromServer;
+    public Date getLastUpdated() {
+        return lastUpdated;
     }
 
-    public void setLastUpdateFromServer(Date lastUpdateFromServer) {
-        this.lastUpdateFromServer = lastUpdateFromServer;
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

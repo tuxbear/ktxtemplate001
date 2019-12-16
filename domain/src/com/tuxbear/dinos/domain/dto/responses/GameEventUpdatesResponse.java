@@ -24,5 +24,4 @@ public class GameEventUpdatesResponse {
 
     private Date timestamp;
     private List<MissionResult> newMissionResults;
-
 }
