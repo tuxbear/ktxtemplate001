@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument
 @DynamoDBDocument
 class Move(
         /**
-         * The timestamp in system time for when the move was made
+         * The timestamp in millisecs from round start this move was made
          */
         @DynamoDBAttribute
         var timestamp: Long,

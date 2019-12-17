@@ -36,7 +36,13 @@ public class GameListScreen extends AbstractFullScreen {
         newGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                CreateGameDialog createGameDialog = new CreateGameDialog(skin);
+                CreateGameDialog createGameDialog = null;
+
+                try {
+                    createGameDialog = new CreateGameDialog(skin);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 createGameDialog.show(stage, dialogResult -> {
                     dinoGames.add((MultiplayerGame) dialogResult);
                     gameListWidget.setGameList(dinoGames);
@@ -69,14 +75,24 @@ public class GameListScreen extends AbstractFullScreen {
         loadingGamesProgressDialog.show(stage);
 
         try {
-            dataService.getActiveGamesForPlayerAsync(playerService.getCurrentPlayer(), (result, status) -> {
-                dinoGames = new ArrayList<>(result);
-                gameListWidget.setGameList(dinoGames);
-                rootTable.invalidateHierarchy();
-                loadingGamesProgressDialog.hide();
+            dataService.getActiveGamesAsync((result, status) -> {
+
+                if (status.getStatus().equals(ServerCallStatus.LOGIN_REQUIRED)) {
+                    game.setScreen(new LoginOrRegisterScreen(game));
+                    return;
+                } else if (status.getStatus().equals(ServerCallStatus.FAILURE)) {
+                    // SHOW SOME ERRROR
+                } else {
+                    dinoGames = new ArrayList<>(Arrays.asList(result));
+                    gameListWidget.setGameList(dinoGames);
+                    rootTable.invalidateHierarchy();
+                    loadingGamesProgressDialog.hide();
+                }
             });
         } catch (IOException e) {
             // TODO: error notification and handling
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

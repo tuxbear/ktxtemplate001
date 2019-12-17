@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 public class BoardPosition {
 
     public static BoardPosition OFF_BOARD = new BoardPosition(-1000, -1000);
+
     @DynamoDBAttribute
     public int x;
     @DynamoDBAttribute

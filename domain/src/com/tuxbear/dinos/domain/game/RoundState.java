@@ -3,9 +3,6 @@ package com.tuxbear.dinos.domain.game;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * Created by Ole - André Johansen on 05.01.14.
- */
 public class RoundState {
 
     private Date expires; // implement?

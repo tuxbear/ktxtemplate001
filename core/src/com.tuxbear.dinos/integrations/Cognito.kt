@@ -20,9 +20,7 @@ class CognitoClient () {
         request.addAuthParametersEntry("USERNAME", username)
         request.addAuthParametersEntry("PASSWORD", password)
 
-
-
-        val result = createClient()?.initiateAuth(request)
+        val result = createClient().initiateAuth(request)
 
         return result?.authenticationResult
     }
@@ -35,18 +33,23 @@ class CognitoClient () {
         signUpRequest.username = username
         signUpRequest.password = password
 
-        val result = createClient()?.signUp(signUpRequest)
-
-        return result
+        return createClient().signUp(signUpRequest)
     }
 
-    private fun createClient(): AWSCognitoIdentityProvider? {
+    fun refreshAccessToken(refreshToken : String) : AuthenticationResultType? {
+        val request = InitiateAuthRequest()
+                .withClientId(cognitoAppClientId)
+                .withAuthFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+                .addAuthParametersEntry("REFRESH_TOKEN", refreshToken);
 
+        return createClient().initiateAuth(request).authenticationResult
+    }
+
+    private fun createClient(): AWSCognitoIdentityProvider {
         return AWSCognitoIdentityProviderClientBuilder
                 .standard()
                 .withCredentials(AWSStaticCredentialsProvider(AnonymousAWSCredentials()))
                 .withRegion("eu-central-1")
                 .build()
-
     }
 }

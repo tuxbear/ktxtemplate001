@@ -5,18 +5,17 @@ import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
-import java.io.IOException;
 import java.util.*;
 
 public class FakeDataService implements DataService {
     @Override
-    public void getPlayerProfile(ServerCallback<Player> responseCallback) throws IOException {
+    public void getPlayerProfile(ServerCallback<Player> responseCallback) throws Exception {
         responseCallback.processResult(new Player(), ServerCallResults.success());
     }
 
     @Override
     public void createGameAsync(String username, List<String> players, String board, int rounds, String difficulty,
-                                final ServerCallback<MultiplayerGame> responseCallback) {
+                                final ServerCallback<MultiplayerGame> responseCallback) throws Exception {
 
         responseCallback.processResult(generateGame_DELETE_ME(rounds, 25), new ServerCallResults(ServerCallStatus.SUCCESS, ""));
     }
@@ -27,16 +26,17 @@ public class FakeDataService implements DataService {
     }
 
     @Override
-    public void getActiveGamesForPlayerAsync(Player player, ServerCallback<List<MultiplayerGame>> responseCallback) {
+    public void getActiveGamesAsync(ServerCallback<MultiplayerGame[]> responseCallback) throws Exception {
 
-        responseCallback.processResult( Arrays.asList(
-                generateGame_DELETE_ME(5,15),
-                generateGame_DELETE_ME(7,15),
-                generateGame_DELETE_ME(3,15),
-                generateGame_DELETE_ME(6,15),
-                generateGame_DELETE_ME(5,15),
-                generateGame_DELETE_ME(10,15),
-                generateGame_DELETE_ME(21,15)),
+        responseCallback.processResult(
+                new MultiplayerGame[]{
+                        generateGame_DELETE_ME(5, 15),
+                        generateGame_DELETE_ME(7, 15),
+                        generateGame_DELETE_ME(3, 15),
+                        generateGame_DELETE_ME(6, 15),
+                        generateGame_DELETE_ME(5, 15),
+                        generateGame_DELETE_ME(10, 15),
+                        generateGame_DELETE_ME(21, 15)},
                 new ServerCallResults(ServerCallStatus.SUCCESS, ""));
 
     }
@@ -70,14 +70,14 @@ public class FakeDataService implements DataService {
         me.setUsername("eleni");
 
         MultiplayerGame multiplayerGame = new MultiplayerGame();
-        multiplayerGame.getPlayers().add(me);
+        multiplayerGame.getPlayers().add(me.getUsername());
 
         multiplayerGame.setBoard(board);
         for(int i = 0; i < 4; i++){
             int x = rand.nextInt(columns);
             int y = rand.nextInt(rows);
 
-            multiplayerGame.getInitialPiecePositions().put(i, new BoardPosition(x, y));
+            multiplayerGame.getInitialPiecePositions().put(Integer.toString(i), new BoardPosition(x, y));
         }
 
         BoardPosition[] missionPos = new BoardPosition[] {

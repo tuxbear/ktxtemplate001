@@ -29,5 +29,6 @@ public class ServerCallResults {
 
     public static ServerCallResults success() { return new ServerCallResults(ServerCallStatus.SUCCESS, null); }
     public static ServerCallResults failure(String message) { return new ServerCallResults(ServerCallStatus.FAILURE, message); }
+    public static ServerCallResults loginRequired() { return new ServerCallResults(ServerCallStatus.LOGIN_REQUIRED, null); }
 
 }

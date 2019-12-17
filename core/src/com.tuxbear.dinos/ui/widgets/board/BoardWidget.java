@@ -18,10 +18,11 @@ import com.tuxbear.dinos.domain.game.MultiplayerGame;
 import com.tuxbear.dinos.domain.game.Wall;
 import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.PlayerService;
-import com.tuxbear.dinos.services.ScoreService;
+import com.tuxbear.dinos.domain.game.ScoreService;
 import com.tuxbear.dinos.services.SettingsService;
 import com.tuxbear.dinos.services.events.EventBus;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -144,12 +145,14 @@ public class BoardWidget extends WidgetGroup {
         walkingSoundId = walkingSound.loop(SettingsService.EFFECTS_VOLUME);
         walkingSound.setLooping(walkingSoundId, true);
 
-        dinoActor.addAction(sequence(moveAction, run(new Runnable() {
-            public void run() {
-                dinoActor.setBoardPosition(nextPos);
-                walkingSound.stop(walkingSoundId);
-                setDinoMoving(false);
+        dinoActor.addAction(sequence(moveAction, run(() -> {
+            dinoActor.setBoardPosition(nextPos);
+            walkingSound.stop(walkingSoundId);
+            setDinoMoving(false);
+            try {
                 checkForWin();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         })));
     }
@@ -172,20 +175,19 @@ public class BoardWidget extends WidgetGroup {
         throw new IllegalArgumentException();
     }
 
-    private void checkForWin() {
+    private void checkForWin() throws IOException {
         if (getDinoByNumber(currentMission.getPieceNumber()).getBoardPosition().equals(currentMission.getPosition())) {
             winSound.play(SettingsService.EFFECTS_VOLUME);
             isSolvingMission = false;
             int timeSpentRoundedDown = (int) Math.floor(currentMissionTimeSpent);
-            int score = IoC.resolve(ScoreService.class).getScore(currentMissionMovesMade, timeSpentRoundedDown, 6);
 
             MissionResult result = new MissionResult();
             result.setGameId(game.getId());
-            result.setNumberOfMoves(currentMissionMovesMade);
             result.setMillisecondsSpent(timeSpentRoundedDown);
-            result.setScore(score);
             result.setMissionId(currentMission.getId());
             result.setMoveSequence(currentMoveSequence);
+            int score = IoC.resolve(ScoreService.class).getScore(result);
+            result.setScore(score);
 
             result.setPlayerId(playerService.getCurrentPlayer().getUsername());
 
@@ -195,7 +197,6 @@ public class BoardWidget extends WidgetGroup {
             eventBus.publishEvent(new MissionAccomplishedEvent(result));
         }
     }
-
 
     @Override
     public void act(float deltaTime) {

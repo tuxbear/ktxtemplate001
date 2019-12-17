@@ -24,7 +24,7 @@ object GameGenerator {
         for (i in 0..3) {
             val x = rand.nextInt(columns)
             val y = rand.nextInt(rows)
-            multiplayerGame.initialPiecePositions[i] = BoardPosition(x, y)
+            multiplayerGame.initialPiecePositions[i.toString()] = BoardPosition(x, y)
         }
         val missionPos = arrayOf(
                 BoardPosition(0, 9),

@@ -21,7 +21,7 @@ public class CreateGameDialog extends AbstractCallbackDialog {
     private Logger logger = IoC.resolve(Logger.class);
 
 
-    public CreateGameDialog(Skin skin) {
+    public CreateGameDialog(Skin skin) throws IOException {
         super("New game", skin);
         final CreateGameDialog self = this;
         final SelectBox<String> boardSelect = new SelectBox<String>(skin);
@@ -82,21 +82,18 @@ public class CreateGameDialog extends AbstractCallbackDialog {
                             boardSelect.getSelection().toString(),
                             9,
                             difficultySelect.getSelection().toString(),
-                            new ServerCallback<MultiplayerGame>() {
-                                @Override
-                                public void processResult(MultiplayerGame result, ServerCallResults status) {
-                                    if (status.getStatus() == ServerCallStatus.SUCCESS) {
-                                        hide();
-                                        loadingDialog.hide();
-                                        result(result);
-                                    } else {
-                                        loadingDialog.hide();
-                                        logger.log(status.getFailureString());
-                                    }
+                            (result, status) -> {
+                                if (status.getStatus() == ServerCallStatus.SUCCESS) {
+                                    hide();
+                                    loadingDialog.hide();
+                                    result(result);
+                                } else {
+                                    loadingDialog.hide();
+                                    logger.log(status.getFailureString());
                                 }
                             }
                     );
-                } catch (IOException e) {
+                } catch (Exception e) {
                     //TODO: notification and handling
                 }
             }

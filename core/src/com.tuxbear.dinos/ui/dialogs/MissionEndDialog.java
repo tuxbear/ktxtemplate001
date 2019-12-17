@@ -9,6 +9,8 @@ import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.PlayerService;
 import com.tuxbear.dinos.ui.widgets.*;
 
+import java.io.IOException;
+
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 03/01/14 Time: 16:21 To change this template use File | Settings | File
  * Templates.
@@ -27,7 +29,7 @@ public class MissionEndDialog extends AbstractCallbackDialog {
 
     private final Button nextMissionButton;
 
-    public MissionEndDialog(MultiplayerGame game, Skin skin, int roundNumberToShow) {
+    public MissionEndDialog(MultiplayerGame game, Skin skin, int roundNumberToShow) throws IOException {
         super("Food found!", skin);
         this.initialMissionNumberToShow = roundNumberToShow;
         this.missionNumberToShow = roundNumberToShow;

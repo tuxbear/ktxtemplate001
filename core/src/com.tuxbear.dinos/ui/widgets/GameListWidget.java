@@ -7,6 +7,7 @@ import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ public class GameListWidget extends Table {
         this.gameSelectedListener = gameSelectedListener;
     }
 
-    public void renderGameList() {
+    public void renderGameList() throws IOException {
 
         clear();
 
@@ -39,7 +40,7 @@ public class GameListWidget extends Table {
 
         for(final MultiplayerGame game : games) {
             row();
-            long score = game.getTotalScoreForPlayer(currentPlayer);
+            long score = game.getTotalScoreForPlayer(currentPlayer.getUsername());
             int rank = game.getPlayerRank(currentPlayer.getUsername());
             int currentMissionNumber = game.getCurrentMissionNumber();
             int numberOfMissions = game.getNumberOfMissions();
@@ -58,7 +59,11 @@ public class GameListWidget extends Table {
                 int selectedGameIndex = clickedRow - 1;
                 if (gameSelectedListener != null && games != null && selectedGameIndex > -1 && selectedGameIndex < games.size()) {
                     MultiplayerGame selectedGame = games.get(selectedGameIndex);
-                    gameSelectedListener.onGameSelected(selectedGame);
+                    try {
+                        gameSelectedListener.onGameSelected(selectedGame);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -88,14 +93,14 @@ public class GameListWidget extends Table {
         }
     }
 
-    public void setGameList(List<MultiplayerGame> gameList) {
+    public void setGameList(List<MultiplayerGame> gameList) throws IOException {
         games = gameList;
         renderGameList();
     }
 
 
     public interface GameSelectedListener {
-        void onGameSelected(MultiplayerGame game);
+        void onGameSelected(MultiplayerGame game) throws IOException;
     }
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class LocalStorageImpl implements LocalStorage {
 
+    private final String userSave = "userSave";
     ObjectMapper jsonSerializer = IoC.resolve(ObjectMapper.class);
 
     @Override
@@ -32,7 +33,7 @@ public class LocalStorageImpl implements LocalStorage {
 
     @Override
     public void saveCurrentUser(Player player) throws JsonProcessingException {
-        Preferences userSave = Gdx.app.getPreferences("userSave");
+        Preferences userSave = Gdx.app.getPreferences(this.userSave);
 
         String playerJsonString = jsonSerializer.writeValueAsString(player);
         userSave.putString("currentPlayer", playerJsonString);
@@ -41,7 +42,7 @@ public class LocalStorageImpl implements LocalStorage {
 
     @Override
     public void saveAccessToken(AuthenticationResultType token) throws JsonProcessingException {
-        Preferences userSave = Gdx.app.getPreferences("userSave");
+        Preferences userSave = Gdx.app.getPreferences(this.userSave);
 
         userSave.putString("token", jsonSerializer.writeValueAsString(token));
         userSave.flush();
@@ -60,17 +61,14 @@ public class LocalStorageImpl implements LocalStorage {
 
     @Override
     public Player getCurrentUser() throws IOException {
-        Preferences userSave = Gdx.app.getPreferences("userSave");
-
+        Preferences userSave = Gdx.app.getPreferences(this.userSave);
         String playerJsonString = userSave.getString("currentPlayer");
-        Player player = jsonSerializer.readValue(playerJsonString, Player.class);
-
-        return player;
+        return jsonSerializer.readValue(playerJsonString, Player.class);
     }
 
     @Override
     public AuthenticationResultType getCurrentAccessToken() throws IOException {
-        Preferences userSave = Gdx.app.getPreferences("userSave");
+        Preferences userSave = Gdx.app.getPreferences(this.userSave);
         return jsonSerializer.readValue(userSave.getString("token"), AuthenticationResultType.class);
     }
 }

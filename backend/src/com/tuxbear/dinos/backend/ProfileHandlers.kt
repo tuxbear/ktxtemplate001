@@ -20,7 +20,7 @@ class ProfileHandler : AbstractAuthorizedHandler {
         playerDao = PlayerDao(dynamoClient)
     }
 
-    override fun handle(input: APIGatewayProxyRequestEvent?, context: Context?): APIGatewayProxyResponseEvent {
+    override fun handle(input: APIGatewayProxyRequestEvent, context: Context?): APIGatewayProxyResponseEvent {
         var player = playerDao.getPlayerByUsername(username)
 
         if (player == null) {

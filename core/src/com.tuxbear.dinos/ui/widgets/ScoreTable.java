@@ -35,15 +35,15 @@ public class ScoreTable extends Table {
 
         row().height(10);
 
-        for(Player player : game.getPlayers()) {
+        for(String player : game.getPlayers()) {
 
             row();
-            MissionResult roundResults = game.getMissionResultForPlayer(player.getUsername(), missionToShowResultsFor.getId());
+            MissionResult roundResults = game.getMissionResultForPlayer(player, missionToShowResultsFor.getId());
 
             add(new PlayerWidget(player, skin)).expandX().center();
 
             if (roundResults != null) {
-                add(String.format("%s", roundResults.getNumberOfMoves())).expandX().center();
+                add(String.format("%s", roundResults.getMoveSequence().getMoves().size())).expandX().center();
                 add(String.format("%s", roundResults.getMillisecondsSpent())).expandX().center();
                 add(String.format("%s", roundResults.getScore())).expandX().center();
             } else {

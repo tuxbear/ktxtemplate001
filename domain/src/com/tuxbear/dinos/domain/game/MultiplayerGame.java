@@ -3,9 +3,11 @@ package com.tuxbear.dinos.domain.game;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedJson;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tuxbear.dinos.domain.events.GameEvent;
@@ -54,9 +56,8 @@ public class MultiplayerGame {
     @DynamoDBAttribute
     private Board board;
 
-    @DynamoDBTypeConvertedJson
     @DynamoDBAttribute
-    private Map<Integer, BoardPosition> initialPiecePositions = new HashMap<>();
+    private Map<String, BoardPosition> initialPiecePositions = new HashMap<>();
 
     @DynamoDBAttribute
     private Set<String> players = new HashSet<>();
@@ -145,11 +146,11 @@ public class MultiplayerGame {
         this.board = board;
     }
 
-    public Map<Integer, BoardPosition> getInitialPiecePositions() {
+    public Map<String, BoardPosition> getInitialPiecePositions() {
         return initialPiecePositions;
     }
 
-    public void setInitialPiecePositions(Map<Integer, BoardPosition> initialPiecePositions) {
+    public void setInitialPiecePositions(Map<String, BoardPosition> initialPiecePositions) {
         this.initialPiecePositions = initialPiecePositions;
     }
 

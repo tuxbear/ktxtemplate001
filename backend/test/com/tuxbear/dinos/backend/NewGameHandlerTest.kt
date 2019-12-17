@@ -42,7 +42,7 @@ internal class NewGameHandlerTest {
     @Test
     internal fun createNewGameTest() {
         val newGameRequest = NewGameRequest(
-                "valley", listOf("eleni"), 5, "easy");
+                "{valley}", emptyList(), 5, "{easy}")
 
         val context = null
         val authorizedRequest = authorizedRequest()

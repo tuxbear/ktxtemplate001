@@ -21,14 +21,18 @@ public class AWSDataService implements DataService {
 
     String getPlayerProfileEndpoint = endpointBaseUrl + "/profile";
     String createGameUrl = endpointBaseUrl + "/new-game";
+
     String getGameUrl = endpointBaseUrl + "/getGame";
-    String getActiveGamesForUserUrl = endpointBaseUrl + "/getactivegames";
-    String reportMissionResultUrl = endpointBaseUrl + "/ReportMissionResult";
+
+    String getActiveGamesForUserUrl = endpointBaseUrl + "/active-games";
+    String reportMissionResultUrl = endpointBaseUrl + "/mission-result";
+
     String getUpdatesUrl = endpointBaseUrl + "/GetUpdates";
 
     private int defaultTimeoutMs = 30 * 1000;
 
     private final ObjectMapper jsonSerializer = IoC.resolve(ObjectMapper.class);
+
     private final LocalStorage localStorage = IoC.resolve(LocalStorage.class);
 
     private final NetJavaImpl netClient;
@@ -39,7 +43,8 @@ public class AWSDataService implements DataService {
 
     @Override
     public void getPlayerProfile(final ServerCallback<Player> responseCallback) throws IOException {
-        netClient.sendHttpRequest(createHttpGetRequest(getPlayerProfileEndpoint), new ServerCallbackAdapter<>(Player.class, responseCallback));
+        Net.HttpRequest request = createHttpGetRequest(getPlayerProfileEndpoint);
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, Player.class, responseCallback));
     }
 
     @Override
@@ -48,60 +53,33 @@ public class AWSDataService implements DataService {
 
         NewGameRequest createGameRequest = new NewGameRequest(board, players, rounds, difficulty);
         Net.HttpRequest request = createHttpPostRequest(createGameUrl, createGameRequest);
-        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(MultiplayerGame.class, responseCallback));
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, MultiplayerGame.class, responseCallback));
     }
 
     @Override
     public void getGameByIdAsync(String id, final ServerCallback<MultiplayerGame> responseCallback) throws IOException {
         GameRequest getGameRequest = new GameRequest(id);
         Net.HttpRequest request = createHttpPostRequest(createGameUrl, getGameRequest);
-        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(MultiplayerGame.class, responseCallback));
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, MultiplayerGame.class, responseCallback));
     }
 
     @Override
-    public void getActiveGamesForPlayerAsync(Player player, final ServerCallback<List<MultiplayerGame>> responseCallback) throws IOException {
-        responseCallback.processResult(new ArrayList<>(), ServerCallResults.success());
-/*
-        ActiveGameListRequest getActiveGamesRequest = new ActiveGameListRequest(player.getUsername());
-        Net.HttpRequest request = createHttpPostRequest(getActiveGamesForUserUrl, getActiveGamesRequest);
-        netClient.sendHttpRequest(request, new Net.HttpResponseListener() {
-            @Override
-            public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                String responseString = httpResponse.getResultAsString();
-                try {
-                    final List<MultiplayerGame> games = Arrays.asList(jsonSerializer.readValue(responseString, MultiplayerGame[].class));
-                    Gdx.app.postRunnable(() ->
-                            responseCallback.processResult(games, new ServerCallResults(ServerCallStatus.SUCCESS, ""))
-                    );
-
-                } catch (IOException e) {
-                    System.out.println(e);
-                }
-            }
-
-            @Override
-            public void failed(Throwable t) {
-                int i = 0;
-            }
-
-            @Override
-            public void cancelled() {
-
-            }
-        });*/
+    public void getActiveGamesAsync(final ServerCallback<MultiplayerGame[]> responseCallback) throws Exception {
+        Net.HttpRequest request = createHttpGetRequest(getActiveGamesForUserUrl);
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, MultiplayerGame[].class, responseCallback));
     }
 
 
     @Override
     public void reportRoundResultsAsync(MissionResult result, ServerCallback<MultiplayerGame> serverCallback) throws IOException {
         Net.HttpRequest request = createHttpPostRequest(reportMissionResultUrl, result);
-        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(MultiplayerGame.class, serverCallback));
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, MultiplayerGame.class, serverCallback));
     }
 
     @Override
     public void getUpdatesAsync(Date since, ServerCallback<com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse> responseCallback) throws IOException {
         Net.HttpRequest request = createHttpPostRequest(getUpdatesUrl, since);
-        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(GameEventUpdatesResponse.class, responseCallback));
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, GameEventUpdatesResponse.class, responseCallback));
     }
 
     private Net.HttpRequest createHttpPostRequest(String url, Object payloadObject) throws IOException {

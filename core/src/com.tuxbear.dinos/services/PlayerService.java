@@ -1,12 +1,19 @@
 package com.tuxbear.dinos.services;
 
+import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.tuxbear.dinos.domain.user.Player;
+
+import java.io.IOException;
 
 public interface PlayerService {
 
-    Player login(String username, String password);
+    AuthenticationResultType login(String username, String password);
 
-    Player getCurrentPlayer();
+    boolean isAuthenticated();
+
+    AuthenticationResultType refreshToken();
+
+    Player getCurrentPlayer() throws IOException;
     Player getPlayerByUsername(String username);
 
     void addFriend(Player addTo, String username);

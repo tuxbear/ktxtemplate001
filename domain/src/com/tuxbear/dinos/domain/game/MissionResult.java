@@ -24,9 +24,6 @@ public class MissionResult {
     @DynamoDBAttribute
     private int millisecondsSpent;
 
-    @DynamoDBAttribute
-    private int numberOfMoves;
-
     public MissionResult() {
     }
 
@@ -60,14 +57,6 @@ public class MissionResult {
 
     public void setMillisecondsSpent(int millisecondsSpent) {
         this.millisecondsSpent = millisecondsSpent;
-    }
-
-    public int getNumberOfMoves() {
-        return numberOfMoves;
-    }
-
-    public void setNumberOfMoves(int numberOfMoves) {
-        this.numberOfMoves = numberOfMoves;
     }
 
     public String getMissionId() {

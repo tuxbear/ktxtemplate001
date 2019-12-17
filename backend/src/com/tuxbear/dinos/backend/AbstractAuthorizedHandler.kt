@@ -7,8 +7,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 
 abstract class AbstractAuthorizedHandler  : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     lateinit var username : String
-    override fun handleRequest(input: APIGatewayProxyRequestEvent?, context: Context?): APIGatewayProxyResponseEvent {
-        val potentialUserName = getUserNameFromToken(input?.headers?.get("Authorization"))
+    override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context?): APIGatewayProxyResponseEvent {
+        val potentialUserName = getUserNameFromToken(input.headers?.get("Authorization"))
 
         if(potentialUserName == null) {
             return APIGatewayProxyResponseEvent()
@@ -21,5 +21,5 @@ abstract class AbstractAuthorizedHandler  : RequestHandler<APIGatewayProxyReques
         return handle(input, context)
     }
 
-    abstract fun handle(input: APIGatewayProxyRequestEvent?, context: Context?): APIGatewayProxyResponseEvent
+    abstract fun handle(input: APIGatewayProxyRequestEvent, context: Context?): APIGatewayProxyResponseEvent
 }

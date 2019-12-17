@@ -36,5 +36,7 @@ internal class ProfileHandlerTest {
         ProfileHandler(localDb).handleRequest(request, context)
 
         assert(typedMapper.scan(DynamoDBScanExpression())[0].username == "jizz666")
+
+        ProfileHandler(localDb).handleRequest(request, context)
     }
 }

@@ -4,6 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import java.io.IOException;
+
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 03/01/14 Time: 16:24 To change this template use File | Settings | File
  * Templates.
@@ -26,7 +28,11 @@ public abstract class AbstractCallbackDialog extends Dialog {
     @Override
     public void result(Object result) {
         if(callbackHandler != null) {
-            callbackHandler.onDialogClose(result);
+            try {
+                callbackHandler.onDialogClose(result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import com.tuxbear.dinos.domain.events.GameEvent;
 import com.tuxbear.dinos.domain.events.GameEventListener;
 import com.tuxbear.dinos.services.*;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -89,7 +90,11 @@ public class EventBusImpl implements EventBus {
             List<GameEventListener> subscribers = subscriptions.get(eventType);
             for(GameEventListener subscriber : subscribers) {
                 log.log("Event sending: " + event.getClass().getSimpleName() + " to " + subscriber.getClass().getSimpleName());
-                subscriber.processEvent(event);
+                try {
+                    subscriber.processEvent(event);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

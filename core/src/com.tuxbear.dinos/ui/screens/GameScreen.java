@@ -32,7 +32,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
     private MultiplayerGame dinosGameInstance;
 
-    public GameScreen(final DinosGame game, MultiplayerGame dinosGameInstance) {
+    public GameScreen(final DinosGame game, MultiplayerGame dinosGameInstance) throws IOException {
         super(game);
         if (dinosGameInstance == null)
         {
@@ -65,7 +65,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         initGameUI();
     }
 
-    private void initGameUI() {
+    private void initGameUI() throws IOException {
         Player currentPlayer = playerService.getCurrentPlayer();
         switch (dinosGameInstance.getLocalGameState(currentPlayer.getUsername())) {
             case WAITING_FOR_OPPONENTS:
@@ -91,7 +91,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         MissionStartDialog missionStartDialog = new MissionStartDialog(this.dinosGameInstance, ResourceContainer.skin);
         missionStartDialog.show(stage, new DialogCallback() {
             @Override
-            public void onDialogClose(Object dialogResult) {
+            public void onDialogClose(Object dialogResult) throws IOException {
                 String result = dialogResult.toString();
                 switch (result) {
                     case "game list":
@@ -113,7 +113,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
     }
 
     @Override
-    public void processEvent(GameEvent event) {
+    public void processEvent(GameEvent event) throws IOException {
 
         if (event instanceof MissionAccomplishedEvent) {
             MissionAccomplishedEvent missionEvent = (MissionAccomplishedEvent) event;
@@ -123,7 +123,13 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                 dataService.reportRoundResultsAsync(missionEvent.getResult(), new ServerCallback<MultiplayerGame>() {
                     @Override
                     public void processResult(MultiplayerGame result, ServerCallResults status) {
+                        dinosGameInstance = result;
                         sendingDialog.hide();
+                        try {
+                            initGameUI();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 });
@@ -135,7 +141,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         }
     }
 
-    private void showMissionAccomplishedDialog() {
+    private void showMissionAccomplishedDialog() throws IOException {
         MissionEndDialog roundEndDialog = new MissionEndDialog(
                 this.dinosGameInstance,
                 ResourceContainer.skin,

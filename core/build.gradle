@@ -12,6 +12,7 @@ dependencies {
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.689'
 
     implementation  "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8"
+    implementation 'com.auth0:java-jwt:3.8.3'
 
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"

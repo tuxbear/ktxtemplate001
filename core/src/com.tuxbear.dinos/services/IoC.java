@@ -2,6 +2,8 @@ package com.tuxbear.dinos.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
+import com.tuxbear.dinos.domain.game.ScoreService;
+import com.tuxbear.dinos.domain.game.ArcadeGameScoreService;
 import com.tuxbear.dinos.services.events.*;
 import com.tuxbear.dinos.services.impl.*;
 import com.tuxbear.dinos.services.impl.aws.AWSDataService;
@@ -24,7 +26,7 @@ public class IoC {
         mapper.registerModule(new KotlinModule());
 
         singletons.put(ObjectMapper.class, mapper);
-        singletons.put(ScoreService.class, new StandardScoreService());
+        singletons.put(ScoreService.class, new ArcadeGameScoreService());
         singletons.put(Logger.class, new DummyLogger());
         singletons.put(EventBus.class, new EventBusImpl());
         singletons.put(LocalStorage.class, new LocalStorageImpl());

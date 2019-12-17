@@ -3,6 +3,7 @@ package com.tuxbear.dinos.domain.user
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedJson
 import java.util.*
 
 @DynamoDBTable(tableName = "playerTable")
@@ -13,14 +14,17 @@ class Player {
     @DynamoDBAttribute
     var lastSeen: Date? = null
 
+    @DynamoDBTypeConvertedJson
     @DynamoDBAttribute
-    var friendIds: MutableSet<String>? = null
+    var friendIds: MutableSet<String> = HashSet()
 
+    @DynamoDBTypeConvertedJson
     @DynamoDBAttribute
-    var blocked: MutableSet<String>? = null
+    var blocked: MutableSet<String> = HashSet()
 
+    @DynamoDBTypeConvertedJson
     @DynamoDBAttribute
-    var activeGames: MutableSet<String>? = null
+    var activeGames: MutableSet<String> = HashSet()
 
     init {
         lastSeen = Date()

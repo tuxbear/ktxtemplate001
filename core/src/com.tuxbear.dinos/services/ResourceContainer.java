@@ -14,31 +14,28 @@ public class ResourceContainer {
 
     public static Skin skin;
 
-    private static float screenDensity = Gdx.graphics.getDensity();
-
     private static BitmapFont normalFont;
     private static BitmapFont smallFont;
     private static BitmapFont largeFont;
 
     static {
-
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/Roboto-Condensed.ttf"));
-        //FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/stoneage.ttf"));
+        //FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/stoneage.ttf"), 2 );
 
-        FreeTypeFontParameter largeFontSize = getDensitiyIndependentFontParameter(generator, 64);
-        FreeTypeFontParameter normalFontSize = getDensitiyIndependentFontParameter(generator, 28);
-        FreeTypeFontParameter smallFontSize = getDensitiyIndependentFontParameter(generator, 16);
+        FreeTypeFontParameter largeFontSize = getDensitiyIndependentFontParameter(generator, 108);
+        FreeTypeFontParameter normalFontSize = getDensitiyIndependentFontParameter(generator, 44);
+        FreeTypeFontParameter smallFontSize = getDensitiyIndependentFontParameter(generator, 22);
 
         smallFont = generator.generateFont(smallFontSize);
         normalFont = generator.generateFont(normalFontSize);
         largeFont = generator.generateFont(largeFontSize);
 
-        skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        skin = new Skin(Gdx.files.internal("ui/flat-earth/flat-earth-ui.json"));
+
         skin.get(Label.LabelStyle.class).font = normalFont;
-        skin.get(Window.WindowStyle.class).titleFont = largeFont;
+        skin.get(TextField.TextFieldStyle.class).font = largeFont;
         skin.get(TextButton.TextButtonStyle.class).font = normalFont;
     }
-
 
     private static FreeTypeFontParameter getDensitiyIndependentFontParameter(FreeTypeFontGenerator generator, int desiredFontSize) {
         FreeTypeFontParameter freeTypeFontParameter = new FreeTypeFontParameter();

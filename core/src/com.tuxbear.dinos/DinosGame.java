@@ -7,6 +7,8 @@ import com.tuxbear.dinos.services.PlayerService;
 import com.tuxbear.dinos.ui.screens.GameListScreen;
 import com.tuxbear.dinos.ui.screens.LoginOrRegisterScreen;
 
+import java.io.IOException;
+
 
 public class DinosGame extends Game {
 
@@ -14,10 +16,14 @@ public class DinosGame extends Game {
 
     @Override
     public void create() {
-        if (playerService.getCurrentPlayer() == null) {
-            setScreen(new LoginOrRegisterScreen(this));
-        } else {
-            setScreen(new GameListScreen(this));
+        try {
+            if (playerService.getCurrentPlayer() == null) {
+                setScreen(new LoginOrRegisterScreen(this));
+            } else {
+                setScreen(new GameListScreen(this));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
