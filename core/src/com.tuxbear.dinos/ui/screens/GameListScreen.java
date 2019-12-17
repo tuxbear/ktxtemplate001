@@ -79,15 +79,15 @@ public class GameListScreen extends AbstractFullScreen {
 
                 if (status.getStatus().equals(ServerCallStatus.LOGIN_REQUIRED)) {
                     game.setScreen(new LoginOrRegisterScreen(game));
-                    return;
                 } else if (status.getStatus().equals(ServerCallStatus.FAILURE)) {
-                    // SHOW SOME ERRROR
+                    // TODO SHOW SOME ERRROR
                 } else {
                     dinoGames = new ArrayList<>(Arrays.asList(result));
                     gameListWidget.setGameList(dinoGames);
                     rootTable.invalidateHierarchy();
-                    loadingGamesProgressDialog.hide();
                 }
+
+                loadingGamesProgressDialog.hide();
             });
         } catch (IOException e) {
             // TODO: error notification and handling

@@ -30,10 +30,11 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
 
     @Override
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
-        logger.log("Received remote response: " + httpResponse.getResultAsString());
+        String resultAsString = httpResponse.getResultAsString();
+        logger.log("Received remote response: " + resultAsString);
         if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
             try {
-                final T receivedObject = jsonSerializer.readValue(httpResponse.getResultAsString(), returnType);
+                final T receivedObject = jsonSerializer.readValue(resultAsString, returnType);
                 Gdx.app.postRunnable(() -> {
                     try {
                         callback.processResult(receivedObject, ServerCallResults.success());
@@ -45,13 +46,13 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
                 callbackWithFailure("failed to deserialize: " + e.getMessage());
             }
         } else if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_UNAUTHORIZED && !hasTriedRefreshToken) {
-                refreshTokenAndRetry(httpResponse);
+                refreshTokenAndRetry();
         } else {
-            callbackWithFailure(httpResponse.getResultAsString());
+            callbackWithFailure(resultAsString);
         }
     }
 
-    private void refreshTokenAndRetry(Net.HttpResponse httpResponse) {
+    private void refreshTokenAndRetry() {
         AuthenticationResultType authenticationResultType = playerService.refreshToken();
         hasTriedRefreshToken = true;
         if (authenticationResultType != null) {
