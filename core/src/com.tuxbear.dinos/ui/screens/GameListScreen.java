@@ -41,11 +41,14 @@ public class GameListScreen extends AbstractFullScreen {
                 try {
                     createGameDialog = new CreateGameDialog(skin);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
-                createGameDialog.show(stage, dialogResult -> {
-                    dinoGames.add((MultiplayerGame) dialogResult);
-                    gameListWidget.setGameList(dinoGames);
+                createGameDialog.show(stage, new DialogCallback() {
+                    @Override
+                    public void onDialogClose(Object dialogResult) throws IOException {
+                        dinoGames.add((MultiplayerGame) dialogResult);
+                        gameListWidget.setGameList(dinoGames);
+                    }
                 });
             }
         });
@@ -61,8 +64,12 @@ public class GameListScreen extends AbstractFullScreen {
         });
 
         rootTable.add(refreshButton).row();
-        gameListWidget = new GameListWidget(ResourceContainer.skin, dinoGame ->
-                game.setScreen(new GameScreen(game, dinoGame)));
+        gameListWidget = new GameListWidget(ResourceContainer.skin, new GameListWidget.GameSelectedListener() {
+            @Override
+            public void onGameSelected(MultiplayerGame dinoGame) throws IOException {
+                game.setScreen(new GameScreen(game, dinoGame));
+            }
+        });
 
         ScrollPane gameListPane = new ScrollPane(gameListWidget, ResourceContainer.skin);
 
@@ -75,24 +82,27 @@ public class GameListScreen extends AbstractFullScreen {
         loadingGamesProgressDialog.show(stage);
 
         try {
-            dataService.getActiveGamesAsync((result, status) -> {
+            dataService.getActiveGamesAsync(new ServerCallback<MultiplayerGame[]>() {
+                @Override
+                public void processResult(MultiplayerGame[] result, ServerCallResults status) throws Exception {
 
-                if (status.getStatus().equals(ServerCallStatus.LOGIN_REQUIRED)) {
-                    game.setScreen(new LoginOrRegisterScreen(game));
-                } else if (status.getStatus().equals(ServerCallStatus.FAILURE)) {
-                    // TODO SHOW SOME ERRROR
-                } else {
-                    dinoGames = new ArrayList<>(Arrays.asList(result));
-                    gameListWidget.setGameList(dinoGames);
-                    rootTable.invalidateHierarchy();
+                    if (status.getStatus().equals(ServerCallStatus.LOGIN_REQUIRED)) {
+                        game.setScreen(new LoginOrRegisterScreen(game));
+                    } else if (status.getStatus().equals(ServerCallStatus.FAILURE)) {
+                        // TODO SHOW SOME ERRROR
+                    } else {
+                        dinoGames = new ArrayList<>(Arrays.asList(result));
+                        gameListWidget.setGameList(dinoGames);
+                        rootTable.invalidateHierarchy();
+                    }
+
+                    loadingGamesProgressDialog.hide();
                 }
-
-                loadingGamesProgressDialog.hide();
             });
         } catch (IOException e) {
             // TODO: error notification and handling
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

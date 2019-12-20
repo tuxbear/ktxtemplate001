@@ -9,7 +9,7 @@ import com.tuxbear.dinos.backend.dynamodb.MultiplayerGameDao
 import com.tuxbear.dinos.backend.dynamodb.PlayerDao
 import com.tuxbear.dinos.backend.dynamodb.jsonMapper
 import com.tuxbear.dinos.domain.dto.requests.NewGameRequest
-import com.tuxbear.dinos.domain.game.MultiplayerGame
+import com.tuxbear.dinos.domain.game.*
 import com.tuxbear.dinos.domain.user.Player
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ internal class NewGameHandlerTest {
     }
 
     @Test
-    internal fun createNewGameTest() {
+    internal fun playSoloGameTest() {
         val newGameRequest = NewGameRequest(
                 "{valley}", emptyList(), 5, "{easy}")
 
@@ -56,7 +56,22 @@ internal class NewGameHandlerTest {
         val response = GetActiveGamesHandler(localDb).handleRequest(authorizedRequest, context)
 
         val games = mapper.readValue<List<MultiplayerGame>>(response.body)
-
         assert(games.size == 1)
+        val game = games[0]
+
+        val result = MissionResult()
+        result.gameId = game.id
+        result.missionId = game.missions[0].id
+        result.playerId = "fake"
+        result.moveSequence = MoveSequence()
+        val moveOne = Move(1000, 0, Direction.Right)
+        result.moveSequence.moves.add(moveOne)
+
+        val reportResultRequest = authorizedRequest()
+                .withBody(jsonMapper.writeValueAsString(result))
+
+        val reportingResponse = ReportMissionResultHandler(localDb).handleRequest(reportResultRequest, context)
+
+        assert(reportingResponse.statusCode == 200)
     }
 }

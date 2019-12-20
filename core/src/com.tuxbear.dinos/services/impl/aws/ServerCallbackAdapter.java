@@ -1,12 +1,16 @@
 package com.tuxbear.dinos.services.impl.aws;
 
-import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.net.*;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
+import com.badlogic.gdx.net.HttpStatus;
+import com.badlogic.gdx.net.NetJavaImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tuxbear.dinos.services.*;
+import com.tuxbear.dinos.domain.user.CognitoTokens;
+import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.Logger;
+import com.tuxbear.dinos.services.PlayerService;
+import com.tuxbear.dinos.services.ServerCallResults;
+import com.tuxbear.dinos.services.ServerCallback;
 
 import java.io.IOException;
 
@@ -35,11 +39,14 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
         if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
             try {
                 final T receivedObject = jsonSerializer.readValue(resultAsString, returnType);
-                Gdx.app.postRunnable(() -> {
-                    try {
-                        callback.processResult(receivedObject, ServerCallResults.success());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            callback.processResult(receivedObject, ServerCallResults.success());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             } catch (IOException e) {
@@ -53,14 +60,23 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
     }
 
     private void refreshTokenAndRetry() {
-        AuthenticationResultType authenticationResultType = playerService.refreshToken();
         hasTriedRefreshToken = true;
-        if (authenticationResultType != null) {
-            request.setHeader("Authorization", authenticationResultType.getIdToken());
-            NetJavaImpl netClient = new NetJavaImpl();
-            netClient.sendHttpRequest(request, this);
-        } else {
-            callbackWithLoginRequired();
+
+        try {
+            playerService.refreshToken(new ServerCallback<CognitoTokens>() {
+                @Override
+                public void processResult(CognitoTokens result, ServerCallResults status) throws Exception {
+                    if (result != null) {
+                        request.setHeader("Authorization", result.getIdToken());
+                        NetJavaImpl netClient = new NetJavaImpl();
+                        netClient.sendHttpRequest(request, ServerCallbackAdapter.this);
+                    } else {
+                        ServerCallbackAdapter.this.callbackWithLoginRequired();
+                    }
+                }
+            });
+        } catch (IOException e) {
+            callbackWithFailure(e.getMessage());
         }
     }
 
@@ -75,20 +91,26 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
     }
 
     private void callbackWithFailure(final String errorString) {
-        Gdx.app.postRunnable(() -> {
-            try {
-                callback.processResult(null, ServerCallResults.failure(errorString));
-            } catch (Exception e) {
-                e.printStackTrace();
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    callback.processResult(null, ServerCallResults.failure(errorString));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
     private void callbackWithLoginRequired() {
-        Gdx.app.postRunnable(() -> {
-            try {
-                callback.processResult(null, ServerCallResults.loginRequired());
-            } catch (Exception e) {
-                e.printStackTrace();
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    callback.processResult(null, ServerCallResults.loginRequired());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }

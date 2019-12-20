@@ -24,14 +24,15 @@ public class IoC {
     static {
 
         mapper.registerModule(new KotlinModule());
-
-        singletons.put(ObjectMapper.class, mapper);
-        singletons.put(ScoreService.class, new ArcadeGameScoreService());
         singletons.put(Logger.class, new DummyLogger());
+        singletons.put(ObjectMapper.class, mapper);
         singletons.put(EventBus.class, new EventBusImpl());
         singletons.put(LocalStorage.class, new LocalStorageImpl());
-        singletons.put(PlayerService.class, new PlayerServiceImpl());
+
+
         singletons.put(DataService.class, new AWSDataService());
+        singletons.put(ScoreService.class, new ArcadeGameScoreService());
+        singletons.put(PlayerService.class, new PlayerServiceImpl());
 
     }
 
@@ -44,9 +45,9 @@ public class IoC {
             try {
                 return implType.newInstance();
             } catch (InstantiationException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new RuntimeException(e);  //To change body of catch statement use File | Settings | File Templates.
             } catch (IllegalAccessException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new RuntimeException(e);  //To change body of catch statement use File | Settings | File Templates.
             }
         }
 

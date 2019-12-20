@@ -32,6 +32,7 @@ public class ResourceContainer {
 
         skin = new Skin(Gdx.files.internal("ui/flat-earth/flat-earth-ui.json"));
 
+
         skin.get(Label.LabelStyle.class).font = normalFont;
         skin.get(TextField.TextFieldStyle.class).font = largeFont;
         skin.get(TextButton.TextButtonStyle.class).font = normalFont;

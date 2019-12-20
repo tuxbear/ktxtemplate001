@@ -145,14 +145,17 @@ public class BoardWidget extends WidgetGroup {
         walkingSoundId = walkingSound.loop(SettingsService.EFFECTS_VOLUME);
         walkingSound.setLooping(walkingSoundId, true);
 
-        dinoActor.addAction(sequence(moveAction, run(() -> {
-            dinoActor.setBoardPosition(nextPos);
-            walkingSound.stop(walkingSoundId);
-            setDinoMoving(false);
-            try {
-                checkForWin();
-            } catch (IOException e) {
-                e.printStackTrace();
+        dinoActor.addAction(sequence(moveAction, run(new Runnable() {
+            @Override
+            public void run() {
+                dinoActor.setBoardPosition(nextPos);
+                walkingSound.stop(walkingSoundId);
+                BoardWidget.this.setDinoMoving(false);
+                try {
+                    BoardWidget.this.checkForWin();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         })));
     }
@@ -191,8 +194,9 @@ public class BoardWidget extends WidgetGroup {
 
             result.setPlayerId(playerService.getCurrentPlayer().getUsername());
 
-            game.reportResultForCurrentRound(result)
-                    .forEach(eventBus::publishEvent);
+            for (GameEvent gameEvent : game.reportResultForCurrentRound(result)) {
+                eventBus.publishEvent(gameEvent);
+            }
 
             eventBus.publishEvent(new MissionAccomplishedEvent(result));
         }

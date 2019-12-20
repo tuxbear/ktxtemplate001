@@ -175,7 +175,6 @@ public class MultiplayerGame {
      * @return
      */
     public List<GameEvent> reportResultForCurrentRound(MissionResult result) {
-
         MissionResult existingResult = getMissionResultForPlayer(result.getPlayerId(), getCurrentMission().getId());
         if (existingResult != null) {
             throw new IllegalArgumentException("Cannot add result, it already exists for this the user " + result.getPlayerId());
@@ -189,6 +188,8 @@ public class MultiplayerGame {
 
             if (getCurrentMissionNumber() == getNumberOfMissions()) {
                 events.add(new GameOverEvent());
+            } else {
+                currentMissionNumber++;
             }
         }
 

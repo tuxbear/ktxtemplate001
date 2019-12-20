@@ -21,7 +21,7 @@ Globals:
     # More information in https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html
   Api:
       Auth:
-        DefaultAuthorizer: DinoCognitoAutorizer
+        #DefaultAuthorizer: DinoCognitoAutorizer
         Authorizers:
           DinoCognitoAutorizer:
             UserPoolArn: 'arn:aws:cognito-idp:eu-central-1:848222475186:userpool/eu-central-1_Mu7zeWwhl' # needs to be dynamic
@@ -143,6 +143,51 @@ Resources:
           Properties:
             Path: /mission-result
             Method: POST
+
+
+  loginOrRegisterHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/libs/backend-1.0.jar
+      Handler: com.tuxbear.dinos.backend.LoginRegisterHandler
+      Runtime: java8
+      MemorySize: 168
+      Timeout: 30
+      Description: Registers or logs in the user
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          region: eu-central-1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: POST
+            Auth:
+              Authorizers: NONE
+
+  refreshTokenHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/libs/backend-1.0.jar
+      Handler: com.tuxbear.dinos.backend.RefreshTokenHandler
+      Runtime: java8
+      MemorySize: 168
+      Timeout: 30
+      Description: Refreshes token
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          region: eu-central-1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /refresh-token
+            Method: POST
+            Auth:
+              Authorizers: NONE
 
   # The table containing a users approved friends: Haskey: username, infotype: 'friendlist': friendUsernames: String[]
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable

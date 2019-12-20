@@ -5,11 +5,12 @@ import com.badlogic.gdx.net.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuxbear.dinos.domain.dto.requests.GameRequest;
+import com.tuxbear.dinos.domain.dto.requests.LoginOrRegisterRequest;
+import com.tuxbear.dinos.domain.dto.responses.GameEventUpdatesResponse;
 import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.domain.dto.requests.NewGameRequest;
-import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,6 +27,8 @@ public class AWSDataService implements DataService {
 
     String getActiveGamesForUserUrl = endpointBaseUrl + "/active-games";
     String reportMissionResultUrl = endpointBaseUrl + "/mission-result";
+    String loginUrl = endpointBaseUrl + "/login";
+    String refreshTokenUrl = endpointBaseUrl + "/refresh-token";
 
     String getUpdatesUrl = endpointBaseUrl + "/GetUpdates";
 
@@ -40,6 +43,19 @@ public class AWSDataService implements DataService {
     public AWSDataService() {
         netClient = new NetJavaImpl();
     }
+
+    @Override
+    public void loginOrRegister(LoginOrRegisterRequest auth, final ServerCallback<CognitoTokens> responseCallback) throws IOException {
+        Net.HttpRequest request = createHttpPostRequest(loginUrl, auth);
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, CognitoTokens.class, responseCallback));
+    }
+
+    @Override
+    public void refreshToken(CognitoTokens tokens, final ServerCallback<CognitoTokens> responseCallback) throws IOException {
+        Net.HttpRequest request = createHttpPostRequest(refreshTokenUrl, tokens);
+        netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, CognitoTokens.class, responseCallback));
+    }
+
 
     @Override
     public void getPlayerProfile(final ServerCallback<Player> responseCallback) throws IOException {
@@ -77,7 +93,7 @@ public class AWSDataService implements DataService {
     }
 
     @Override
-    public void getUpdatesAsync(Date since, ServerCallback<com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse> responseCallback) throws IOException {
+    public void getUpdatesAsync(Date since, ServerCallback<GameEventUpdatesResponse> responseCallback) throws IOException {
         Net.HttpRequest request = createHttpPostRequest(getUpdatesUrl, since);
         netClient.sendHttpRequest(request, new ServerCallbackAdapter<>(request, GameEventUpdatesResponse.class, responseCallback));
     }
@@ -92,13 +108,16 @@ public class AWSDataService implements DataService {
 
     private Net.HttpRequest createHttpRequest(String url, String httpMethod, Object payloadObject) throws IOException {
         Net.HttpRequest request = new Net.HttpRequest(httpMethod);
-        request.setHeader("Authorization", localStorage.getCurrentAccessToken().getIdToken());
+        CognitoTokens currentAccessToken = localStorage.getCurrentAccessToken();
+        if (currentAccessToken != null) {
+            request.setHeader("Authorization", currentAccessToken.getIdToken());
+        }
         String jsonString = null;
         if (payloadObject != null) {
             try {
                 jsonString = jsonSerializer.writeValueAsString(payloadObject);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         request.setContent(jsonString);

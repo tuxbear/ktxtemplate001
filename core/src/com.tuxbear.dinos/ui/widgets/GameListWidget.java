@@ -62,7 +62,7 @@ public class GameListWidget extends Table {
                     try {
                         gameSelectedListener.onGameSelected(selectedGame);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 }
             }

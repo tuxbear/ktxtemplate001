@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class DinosGame extends Game {
 
-    PlayerService playerService = IoC.resolve(PlayerService.class);
+    private PlayerService playerService = IoC.resolve(PlayerService.class);
 
     @Override
     public void create() {
@@ -23,7 +23,7 @@ public class DinosGame extends Game {
                 setScreen(new GameListScreen(this));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

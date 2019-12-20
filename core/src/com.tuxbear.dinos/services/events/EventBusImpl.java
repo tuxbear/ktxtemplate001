@@ -93,7 +93,7 @@ public class EventBusImpl implements EventBus {
                 try {
                     subscriber.processEvent(event);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }

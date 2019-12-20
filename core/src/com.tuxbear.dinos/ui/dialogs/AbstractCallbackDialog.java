@@ -31,7 +31,7 @@ public abstract class AbstractCallbackDialog extends Dialog {
             try {
                 callbackHandler.onDialogClose(result);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.tuxbear.dinos.services.impl.aws.responses;
+package com.tuxbear.dinos.domain.dto.responses;
 
 import com.tuxbear.dinos.domain.game.*;
 

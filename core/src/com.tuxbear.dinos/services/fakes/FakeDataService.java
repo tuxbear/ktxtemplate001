@@ -1,13 +1,25 @@
 package com.tuxbear.dinos.services.fakes;
 
+import com.tuxbear.dinos.domain.dto.requests.LoginOrRegisterRequest;
+import com.tuxbear.dinos.domain.dto.responses.GameEventUpdatesResponse;
 import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.*;
 import com.tuxbear.dinos.services.*;
-import com.tuxbear.dinos.services.impl.aws.responses.GameEventUpdatesResponse;
 
+import java.io.IOException;
 import java.util.*;
 
 public class FakeDataService implements DataService {
+    @Override
+    public void loginOrRegister(LoginOrRegisterRequest auth, ServerCallback<CognitoTokens> responseCallback) throws IOException {
+
+    }
+
+    @Override
+    public void refreshToken(CognitoTokens tokens, ServerCallback<CognitoTokens> responseCallback) throws IOException {
+
+    }
+
     @Override
     public void getPlayerProfile(ServerCallback<Player> responseCallback) throws Exception {
         responseCallback.processResult(new Player(), ServerCallResults.success());

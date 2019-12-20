@@ -62,10 +62,10 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
         eventBus.subscribe(this, MissionAccomplishedEvent.class);
 
-        initGameUI();
+        refreshGameUi();
     }
 
-    private void initGameUI() throws IOException {
+    private void refreshGameUi() throws IOException {
         Player currentPlayer = playerService.getCurrentPlayer();
         switch (dinosGameInstance.getLocalGameState(currentPlayer.getUsername())) {
             case WAITING_FOR_OPPONENTS:
@@ -122,13 +122,17 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
             try {
                 dataService.reportRoundResultsAsync(missionEvent.getResult(), new ServerCallback<MultiplayerGame>() {
                     @Override
-                    public void processResult(MultiplayerGame result, ServerCallResults status) {
-                        dinosGameInstance = result;
+                    public void processResult(MultiplayerGame result, ServerCallResults status) throws Exception {
+                        // TODO: handle status FAILED
+                        if (status.getStatus().equals(ServerCallStatus.SUCCESS)) {
+                            dinosGameInstance = result;
+                        }
+
                         sendingDialog.hide();
                         try {
-                            initGameUI();
+                            GameScreen.this.refreshGameUi();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
 
                     }
@@ -150,7 +154,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
         roundEndDialog.show(stage, new DialogCallback() {
             @Override
-            public void onDialogClose(Object dialogResult) {
+            public void onDialogClose(Object dialogResult) throws IOException {
                 String result = dialogResult.toString();
                 switch (result) {
                     case "main menu":
@@ -162,7 +166,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                         break;
 
                     case "next":
-                        showMissionStartDialog();
+                        GameScreen.this.showMissionStartDialog();
                         break;
                 }
 

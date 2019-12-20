@@ -1,11 +1,11 @@
 package com.tuxbear.dinos.services.impl;
 
-import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuxbear.dinos.domain.game.MultiplayerGame;
+import com.tuxbear.dinos.domain.user.CognitoTokens;
 import com.tuxbear.dinos.domain.user.Player;
 import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.LocalStorage;
@@ -41,7 +41,7 @@ public class LocalStorageImpl implements LocalStorage {
     }
 
     @Override
-    public void saveAccessToken(AuthenticationResultType token) throws JsonProcessingException {
+    public void saveAccessToken(CognitoTokens token) throws JsonProcessingException {
         Preferences userSave = Gdx.app.getPreferences(this.userSave);
 
         userSave.putString("token", jsonSerializer.writeValueAsString(token));
@@ -63,12 +63,13 @@ public class LocalStorageImpl implements LocalStorage {
     public Player getCurrentUser() throws IOException {
         Preferences userSave = Gdx.app.getPreferences(this.userSave);
         String playerJsonString = userSave.getString("currentPlayer");
-        return jsonSerializer.readValue(playerJsonString, Player.class);
+        return playerJsonString == null || playerJsonString == "" ? null : jsonSerializer.readValue(playerJsonString, Player.class);
     }
 
     @Override
-    public AuthenticationResultType getCurrentAccessToken() throws IOException {
+    public CognitoTokens getCurrentAccessToken() throws IOException {
         Preferences userSave = Gdx.app.getPreferences(this.userSave);
-        return jsonSerializer.readValue(userSave.getString("token"), AuthenticationResultType.class);
+        String token = userSave.getString("token");
+        return token == null || token == "" ? null : jsonSerializer.readValue(token, CognitoTokens.class);
     }
 }

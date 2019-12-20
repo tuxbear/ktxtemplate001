@@ -139,7 +139,8 @@ class ReportMissionResultHandler : AbstractAuthorizedHandler {
             }
 
             result.score = ArcadeGameScoreService().getScore(result)
-            game.missionResults.add(result)
+            game.reportResultForCurrentRound(result)
+            game.state = game.calculateGlobalGameState()
 
             gameDao.tableMapper.save(game)
 

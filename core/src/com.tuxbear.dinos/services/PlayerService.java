@@ -1,17 +1,17 @@
 package com.tuxbear.dinos.services;
 
-import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
+import com.tuxbear.dinos.domain.user.CognitoTokens;
 import com.tuxbear.dinos.domain.user.Player;
 
 import java.io.IOException;
 
 public interface PlayerService {
 
-    AuthenticationResultType login(String username, String password);
+    void login(String username, String password, ServerCallback<CognitoTokens> callback) throws IOException;
 
     boolean isAuthenticated();
 
-    AuthenticationResultType refreshToken();
+    void refreshToken(ServerCallback<CognitoTokens> callback) throws IOException;
 
     Player getCurrentPlayer() throws IOException;
     Player getPlayerByUsername(String username);

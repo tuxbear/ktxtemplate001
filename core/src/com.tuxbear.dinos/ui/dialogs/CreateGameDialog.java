@@ -82,14 +82,17 @@ public class CreateGameDialog extends AbstractCallbackDialog {
                             boardSelect.getSelection().toString(),
                             9,
                             difficultySelect.getSelection().toString(),
-                            (result, status) -> {
-                                if (status.getStatus() == ServerCallStatus.SUCCESS) {
-                                    hide();
-                                    loadingDialog.hide();
-                                    result(result);
-                                } else {
-                                    loadingDialog.hide();
-                                    logger.log(status.getFailureString());
+                            new ServerCallback<MultiplayerGame>() {
+                                @Override
+                                public void processResult(MultiplayerGame result, ServerCallResults status) throws Exception {
+                                    if (status.getStatus() == ServerCallStatus.SUCCESS) {
+                                        hide();
+                                        loadingDialog.hide();
+                                        result(result);
+                                    } else {
+                                        loadingDialog.hide();
+                                        logger.log(status.getFailureString());
+                                    }
                                 }
                             }
                     );
