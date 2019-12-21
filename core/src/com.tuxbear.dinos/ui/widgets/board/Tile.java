@@ -26,7 +26,7 @@ public class Tile extends BoardElement implements Disposable {
         super(boardWidget, new BoardPosition(x,y));
         this.size = size;
         this.boardWidget = boardWidget;
-        tileTexture = new Texture(Gdx.files.internal("tile_dark.png"));
+        tileTexture = new Texture(Gdx.files.internal("tile.png"));
         tileSprite = new Sprite(tileTexture);
         tileSprite.setSize(size,size);
 

@@ -134,7 +134,7 @@ public class BoardWidget extends WidgetGroup {
         moveAction.setDuration(dinoActor.getBoardPosition().getDistanceTo(nextPos) * dinoActor.getSpeed());
         moveAction.setInterpolation(Interpolation.pow2Out);
 
-        Move thisMove = new Move(Instant.now().toEpochMilli(), dinoActor.getPieceNumber(), direction);
+        Move thisMove = new Move((long) (currentMissionTimeSpent * 1000), dinoActor.getPieceNumber(), direction);
 
         currentMoveSequence.getMoves().add(thisMove);
 

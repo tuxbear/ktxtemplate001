@@ -8,23 +8,28 @@ import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.events.*;
 
+import java.time.Instant;
+
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 08/12/13 Time: 16:10 To change this template use File | Settings | File
  * Templates.
  */
 public class RoundStatusBar extends Table implements GameEventListener{
+    private final Label totalScoreLabel;
     EventBus eventBus = IoC.resolve(EventBus.class);
 
     private int numberOfMoves;
-    private float elapsed;
 
-    private final Label movesLabel;
+    private final Label moveScoreLabel;
 
-    private final Label timeLabel;
+    private final Label firstMoveScoreLabel;
 
     private boolean isRoundActive;
+    private Long firstMoveTime;
 
     private final Image missionDinoImage;
+    private ScoreService scoreService = new ArcadeGameScoreService();
+    private long missionStartTime;
 
 
     public RoundStatusBar(Skin skin) {
@@ -33,23 +38,28 @@ public class RoundStatusBar extends Table implements GameEventListener{
 
         missionDinoImage = new Image();
 
-        movesLabel = new Label("0", skin);
-        timeLabel = new Label("00:00", skin);
-        add(missionDinoImage);
-        add(movesLabel);
-        add(timeLabel);
+        moveScoreLabel = new Label("0", skin);
+        firstMoveScoreLabel = new Label("0", skin);
+        totalScoreLabel = new Label("0", skin);
+
+        add(missionDinoImage).padRight(50);
+        add(firstMoveScoreLabel).width(100);
+        add(" + ").width(50);
+        add(moveScoreLabel).width(100);
+        add(" = ").width(50);
+        add(totalScoreLabel).width(100);
     }
 
     @Override
     public void act(float delta) {
+        super.act(delta);
         if (isRoundActive) {
-            elapsed += delta;
-            int elapsedSeconds = (int)Math.floor(elapsed);
-            int elapsedMinutes = elapsedSeconds / 60;
-            elapsedSeconds = elapsedSeconds % 60;
-            movesLabel.setText("" + numberOfMoves);
-
-            timeLabel.setText( String.format("%02d:%02d", elapsedMinutes, elapsedSeconds));
+            int moveScore = scoreService.moveScore(numberOfMoves);
+            moveScoreLabel.setText(moveScore);
+            long timeToUse = firstMoveTime == 0 ? Instant.now().toEpochMilli() - missionStartTime : firstMoveTime;
+            int firstMoverScore = scoreService.getFirstMoverScore(timeToUse);
+            firstMoveScoreLabel.setText(firstMoverScore);
+            totalScoreLabel.setText(moveScore + firstMoverScore);
             invalidateHierarchy();
         }
     }
@@ -68,6 +78,7 @@ public class RoundStatusBar extends Table implements GameEventListener{
 
     private void onDinoMoved() {
         numberOfMoves++;
+        firstMoveTime = Instant.now().toEpochMilli() - missionStartTime;
     }
 
     private void onMissionAccomplished() {
@@ -77,7 +88,8 @@ public class RoundStatusBar extends Table implements GameEventListener{
     private void onStartMission(Mission mission) {
         missionDinoImage.setDrawable(new SpriteDrawable(new Sprite(DinoActor.getDinoTextureFromNumber(mission.getPieceNumber()))));
         numberOfMoves = 0;
-        elapsed = 0;
+        firstMoveTime = 0l;
+        missionStartTime = Instant.now().toEpochMilli();
         isRoundActive = true;
     }
 }

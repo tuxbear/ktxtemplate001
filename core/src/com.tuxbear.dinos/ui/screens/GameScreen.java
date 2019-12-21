@@ -1,26 +1,41 @@
 package com.tuxbear.dinos.ui.screens;
 
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.*;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.tuxbear.dinos.*;
-import com.tuxbear.dinos.domain.events.*;
-import com.tuxbear.dinos.domain.game.*;
+import com.tuxbear.dinos.DinosGame;
+import com.tuxbear.dinos.domain.events.GameEvent;
+import com.tuxbear.dinos.domain.events.GameEventListener;
+import com.tuxbear.dinos.domain.events.MissionAccomplishedEvent;
+import com.tuxbear.dinos.domain.game.MultiplayerGame;
 import com.tuxbear.dinos.domain.user.Player;
-import com.tuxbear.dinos.services.*;
-import com.tuxbear.dinos.services.events.*;
-import com.tuxbear.dinos.ui.widgets.board.*;
-import com.tuxbear.dinos.ui.dialogs.*;
+import com.tuxbear.dinos.services.DataService;
+import com.tuxbear.dinos.services.IoC;
+import com.tuxbear.dinos.services.Logger;
+import com.tuxbear.dinos.services.PlayerService;
+import com.tuxbear.dinos.services.ResourceContainer;
+import com.tuxbear.dinos.services.ServerCallResults;
+import com.tuxbear.dinos.services.ServerCallStatus;
+import com.tuxbear.dinos.services.ServerCallback;
+import com.tuxbear.dinos.services.events.EventBus;
+import com.tuxbear.dinos.ui.dialogs.DialogCallback;
+import com.tuxbear.dinos.ui.dialogs.LoadingDialog;
+import com.tuxbear.dinos.ui.dialogs.MissionEndDialog;
+import com.tuxbear.dinos.ui.dialogs.MissionStartDialog;
+import com.tuxbear.dinos.ui.widgets.board.BoardWidget;
+import com.tuxbear.dinos.ui.widgets.board.DinoActor;
+import com.tuxbear.dinos.ui.widgets.board.RoundStatusBar;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 03/12/13 Time: 15:07 To change this template use File | Settings | File
- * Templates.
- */
 public class GameScreen extends AbstractFullScreen implements GameEventListener {
 
     private BoardWidget boardWidget;
@@ -34,10 +49,10 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
     public GameScreen(final DinosGame game, MultiplayerGame dinosGameInstance) throws IOException {
         super(game);
-        if (dinosGameInstance == null)
-        {
+        if (dinosGameInstance == null) {
             logger.log("Trying to start a null-instace game!");
         }
+        eventBus.subscribe(this, MissionAccomplishedEvent.class);
 
         this.dinosGameInstance = dinosGameInstance;
 
@@ -52,17 +67,43 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         boardWidget = new BoardWidget(dinosGameInstance, tileSize);
         statusBar = new RoundStatusBar(ResourceContainer.skin);
 
-        Touchpad tp = new Touchpad(2f, ResourceContainer.skin);
-        tp.setResetOnTouchUp(true);
-        tp.setFillParent(true);
-
         rootTable.add(statusBar).height(boardWidget.tileSize).top();
         rootTable.row();
         rootTable.add(boardWidget).top();
 
-        eventBus.subscribe(this, MissionAccomplishedEvent.class);
+        Table touchControllers = new Table();
+        float touchControllerSize = tileSize * 1.5f;
+        touchControllers.add(getTouchControllerForDino(0)).width(touchControllerSize).pad(20);
+        touchControllers.add(getTouchControllerForDino(1)).width(touchControllerSize).pad(20);
+        touchControllers.add(getTouchControllerForDino(2)).width(touchControllerSize).pad(20);
+        touchControllers.add(getTouchControllerForDino(3)).width(touchControllerSize).pad(20);
+
+        rootTable.row();
+        rootTable.add(touchControllers).height(touchControllerSize);
 
         refreshGameUi();
+    }
+
+    @NotNull
+    private Touchpad getTouchControllerForDino(int dino) {
+        Touchpad touchpad = new Touchpad(2f, ResourceContainer.skin);
+        touchpad.setResetOnTouchUp(true);
+
+        Texture dinoTextureFromNumber = DinoActor.getDinoTextureFromNumber(dino);
+        Sprite dinoKnobSprite = new Sprite(dinoTextureFromNumber);
+
+        dinoKnobSprite.setAlpha(0.8f);
+        dinoKnobSprite.setColor(Color.WHITE);
+        dinoKnobSprite.setSize(75,75);
+        SpriteDrawable drawable = new SpriteDrawable(dinoKnobSprite);
+
+        Sprite backGround = new Sprite(new Texture(Gdx.files.internal("tile.png")));
+        touchpad.setStyle(new Touchpad.TouchpadStyle(
+            new SpriteDrawable(backGround),
+                drawable
+        ));
+
+        return touchpad;
     }
 
     private void refreshGameUi() throws IOException {
@@ -139,6 +180,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                 });
             } catch (IOException e) {
                 //TODO: handle breakdown in comms somehow, store to localstorage and sync later?
+                throw new RuntimeException(e);
             }
 
             showMissionAccomplishedDialog();
@@ -169,7 +211,6 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                         GameScreen.this.showMissionStartDialog();
                         break;
                 }
-
             }
         });
     }
