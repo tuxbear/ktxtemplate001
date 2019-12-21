@@ -170,6 +170,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                         }
 
                         sendingDialog.hide();
+                        showMissionAccomplishedDialog();
                         try {
                             GameScreen.this.refreshGameUi();
                         } catch (IOException e) {
@@ -182,8 +183,6 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                 //TODO: handle breakdown in comms somehow, store to localstorage and sync later?
                 throw new RuntimeException(e);
             }
-
-            showMissionAccomplishedDialog();
         }
     }
 
@@ -209,6 +208,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
                     case "next":
                         GameScreen.this.showMissionStartDialog();
+
                         break;
                 }
             }

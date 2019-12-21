@@ -10,10 +10,6 @@ import com.tuxbear.dinos.services.events.*;
 
 import java.time.Instant;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 08/12/13 Time: 16:10 To change this template use File | Settings | File
- * Templates.
- */
 public class RoundStatusBar extends Table implements GameEventListener{
     private final Label totalScoreLabel;
     EventBus eventBus = IoC.resolve(EventBus.class);
@@ -41,6 +37,7 @@ public class RoundStatusBar extends Table implements GameEventListener{
         moveScoreLabel = new Label("0", skin);
         firstMoveScoreLabel = new Label("0", skin);
         totalScoreLabel = new Label("0", skin);
+        totalScoreLabel.setFontScale(2.0f);
 
         add(missionDinoImage).padRight(50);
         add(firstMoveScoreLabel).width(100);
@@ -54,7 +51,7 @@ public class RoundStatusBar extends Table implements GameEventListener{
     public void act(float delta) {
         super.act(delta);
         if (isRoundActive) {
-            int moveScore = scoreService.moveScore(numberOfMoves);
+            int moveScore = scoreService.getMoveScore(numberOfMoves);
             moveScoreLabel.setText(moveScore);
             long timeToUse = firstMoveTime == 0 ? Instant.now().toEpochMilli() - missionStartTime : firstMoveTime;
             int firstMoverScore = scoreService.getFirstMoverScore(timeToUse);
@@ -72,13 +69,15 @@ public class RoundStatusBar extends Table implements GameEventListener{
         } else if (eventType == MissionAccomplishedEvent.class) {
             onMissionAccomplished();
         } else if (eventType == DinoMovedEvent.class) {
-            onDinoMoved();
+            onDinoMoved((DinoMovedEvent) event);
         }
     }
 
-    private void onDinoMoved() {
+    private void onDinoMoved(DinoMovedEvent event) {
         numberOfMoves++;
-        firstMoveTime = Instant.now().toEpochMilli() - missionStartTime;
+        if (firstMoveTime == 0) {
+            firstMoveTime = event.getMove().getTimestamp();
+        }
     }
 
     private void onMissionAccomplished() {

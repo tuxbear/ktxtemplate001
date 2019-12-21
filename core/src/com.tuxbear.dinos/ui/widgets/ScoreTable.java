@@ -2,7 +2,6 @@ package com.tuxbear.dinos.ui.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.tuxbear.dinos.domain.game.*;
-import com.tuxbear.dinos.domain.user.*;
 
 /**
  * Created with IntelliJ IDEA. User: tuxbear Date: 03/01/14 Time: 17:45 To change this template use File | Settings | File
@@ -33,7 +32,7 @@ public class ScoreTable extends Table {
         add("<round>").expandX().center();
         add("<total>").expandX().center();
 
-        row().height(10);
+        row().height(100);
 
         for(String player : game.getPlayers()) {
 
@@ -44,7 +43,7 @@ public class ScoreTable extends Table {
 
             if (roundResults != null) {
                 add(String.format("%s", roundResults.getMoveSequence().getMoves().size())).expandX().center();
-                add(String.format("%s", roundResults.getMillisecondsSpent())).expandX().center();
+                add(String.format("%s", roundResults.getFirstMoveScore())).expandX().center();
                 add(String.format("%s", roundResults.getScore())).expandX().center();
             } else {
                 add("-").expandX().center();

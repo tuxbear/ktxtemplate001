@@ -35,7 +35,7 @@ public class ServerCallbackAdapter<T> implements Net.HttpResponseListener {
     @Override
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
         String resultAsString = httpResponse.getResultAsString();
-        logger.log("Received remote response: " + resultAsString);
+        logger.log("Received remote response: HTTP(" + httpResponse.getStatus().getStatusCode() + ") -> '" + resultAsString + "'");
         if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
             try {
                 final T receivedObject = jsonSerializer.readValue(resultAsString, returnType);

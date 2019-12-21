@@ -132,7 +132,7 @@ class ReportMissionResultHandler : AbstractAuthorizedHandler {
             result.playerId = username
             val game = gameDao.tableMapper.load(result.gameId)
 
-            val existingEntry = game.missionResults.find { mr -> mr.gameId == result.gameId && mr.playerId == username && result.missionId == result.missionId }
+            val existingEntry = game.getMissionResultForPlayer(username, result.missionId);
 
             if (existingEntry != null) {
                 return APIGatewayProxyResponseEvent().withStatusCode(400)

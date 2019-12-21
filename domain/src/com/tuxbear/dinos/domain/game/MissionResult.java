@@ -22,7 +22,10 @@ public class MissionResult {
     private int score;
 
     @DynamoDBAttribute
-    private int millisecondsSpent;
+    private int firstMoveScore;
+
+    @DynamoDBAttribute
+    private int moveScore;
 
     public MissionResult() {
     }
@@ -51,12 +54,12 @@ public class MissionResult {
         this.score = score;
     }
 
-    public int getMillisecondsSpent() {
-        return millisecondsSpent;
+    public int getFirstMoveScore() {
+        return firstMoveScore;
     }
 
-    public void setMillisecondsSpent(int millisecondsSpent) {
-        this.millisecondsSpent = millisecondsSpent;
+    public void setFirstMoveScore(int firstMoveScore) {
+        this.firstMoveScore = firstMoveScore;
     }
 
     public String getMissionId() {
@@ -73,5 +76,13 @@ public class MissionResult {
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
+    }
+
+    public int getMoveScore() {
+        return moveScore;
+    }
+
+    public void setMoveScore(int moveScore) {
+        this.moveScore = moveScore;
     }
 }

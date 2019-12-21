@@ -14,16 +14,16 @@ public class ResourceContainer {
 
     public static Skin skin;
 
-    private static BitmapFont normalFont;
-    private static BitmapFont smallFont;
-    private static BitmapFont largeFont;
+    public static BitmapFont normalFont;
+    public static BitmapFont smallFont;
+    public static BitmapFont largeFont;
 
     static {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/Roboto-Condensed.ttf"));
         //FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/stoneage.ttf"), 2 );
 
         FreeTypeFontParameter largeFontSize = getDensitiyIndependentFontParameter(generator, 108);
-        FreeTypeFontParameter normalFontSize = getDensitiyIndependentFontParameter(generator, 44);
+        FreeTypeFontParameter normalFontSize = getDensitiyIndependentFontParameter(generator, 64);
         FreeTypeFontParameter smallFontSize = getDensitiyIndependentFontParameter(generator, 22);
 
         smallFont = generator.generateFont(smallFontSize);

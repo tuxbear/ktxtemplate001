@@ -16,6 +16,8 @@ public abstract class AbstractCallbackDialog extends Dialog {
     public AbstractCallbackDialog(String title, Skin skin) {
         super(title, skin);
 
+        getTitleLabel().setFontScale(3.0f);
+
         setMovable(false);
         invalidateHierarchy();
     }
@@ -29,6 +31,7 @@ public abstract class AbstractCallbackDialog extends Dialog {
     public void result(Object result) {
         if(callbackHandler != null) {
             try {
+                this.remove();
                 callbackHandler.onDialogClose(result);
             } catch (IOException e) {
                 throw new RuntimeException(e);

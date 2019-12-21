@@ -7,10 +7,6 @@ import com.tuxbear.dinos.services.*;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 21/12/13 Time: 16:17 To change this template use File | Settings | File
- * Templates.
- */
 public class EventBusImpl implements EventBus {
 
     HashMap<Class<? extends GameEvent>, List<GameEventListener>> subscriptions = new HashMap<>();

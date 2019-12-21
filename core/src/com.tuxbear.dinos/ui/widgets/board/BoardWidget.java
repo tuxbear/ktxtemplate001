@@ -23,7 +23,6 @@ import com.tuxbear.dinos.services.SettingsService;
 import com.tuxbear.dinos.services.events.EventBus;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.List;
 
@@ -186,11 +185,16 @@ public class BoardWidget extends WidgetGroup {
 
             MissionResult result = new MissionResult();
             result.setGameId(game.getId());
-            result.setMillisecondsSpent(timeSpentRoundedDown);
+            result.setFirstMoveScore(timeSpentRoundedDown);
             result.setMissionId(currentMission.getId());
             result.setMoveSequence(currentMoveSequence);
-            int score = IoC.resolve(ScoreService.class).getScore(result);
+            ScoreService scoreService = IoC.resolve(ScoreService.class);
+
+            int score = scoreService.getScore(result);
+
             result.setScore(score);
+            result.setFirstMoveScore(scoreService.getFirstMoverScore(currentMoveSequence.getMoves().get(0).getTimestamp()));
+            result.setMoveScore(scoreService.getMoveScore(currentMoveSequence.getMoves().size()));
 
             result.setPlayerId(playerService.getCurrentPlayer().getUsername());
 

@@ -35,6 +35,7 @@ public class AWSDataService implements DataService {
     private int defaultTimeoutMs = 30 * 1000;
 
     private final ObjectMapper jsonSerializer = IoC.resolve(ObjectMapper.class);
+    private final Logger logger = IoC.resolve(Logger.class);
 
     private final LocalStorage localStorage = IoC.resolve(LocalStorage.class);
 
@@ -123,6 +124,9 @@ public class AWSDataService implements DataService {
         request.setContent(jsonString);
         request.setUrl(url);
         request.setTimeOut(defaultTimeoutMs);
+
+        logger.log(String.format("Created request to %s with payload %s", url.replace(endpointBaseUrl, ""), jsonString));
+
         return request;
     }
 }

@@ -7,7 +7,7 @@ class ArcadeGameScoreService : ScoreService {
         return if (millisBeforeMove == null) 0 else (5000 - (millisBeforeMove/10)).toInt()
     }
 
-    override fun moveScore(moves: Int): Int {
+    override fun getMoveScore(moves: Int): Int {
         return max(5000 - (500 * moves), 0)
     }
 
@@ -15,7 +15,7 @@ class ArcadeGameScoreService : ScoreService {
 
         val firstMoveTimestamp = result.moveSequence.moves[0]?.timestamp
         val firstMoveScore = getFirstMoverScore(firstMoveTimestamp)
-        val moveScore = moveScore(result.moveSequence.moves.size)
+        val moveScore = getMoveScore(result.moveSequence.moves.size)
 
         return moveScore + firstMoveScore
     }

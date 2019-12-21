@@ -33,10 +33,10 @@ public class GameListWidget extends Table {
 
         Player currentPlayer = playerService.getCurrentPlayer();
 
-        add("Rank").center();
-        add("Opponents").center();
-        add("Mission").center();
-        add("Status").center();
+        add("Rank").width(150).center();
+        add("VS").width(350).center();
+        add("Mission").width(200).center();
+        add("Status").width(200).center();
 
         for(final MultiplayerGame game : games) {
             row();
@@ -46,10 +46,10 @@ public class GameListWidget extends Table {
             int numberOfMissions = game.getNumberOfMissions();
             LocalGameState status = game.getLocalGameState(currentPlayer.getUsername());
 
-            add(String.format("#%s \n %sp", rank, score)).center();
-            add(String.format("vs %s", game.getOpponentString(currentPlayer.getUsername()))).center();
-            add(String.format("%s / %s", currentMissionNumber, numberOfMissions)).center();
-            add(String.format("%s", status.prettyString())).center();
+            add(String.format("#%s", rank)).width(150).center();
+            add(String.format("%s", game.getOpponentString(currentPlayer.getUsername()))).width(350).center();
+            add(String.format("%s / %s", currentMissionNumber, numberOfMissions)).width(200).center();
+            add(String.format("%s", status.prettyString())).width(200).center();
         }
 
         addListener(new ClickListener() {

@@ -215,11 +215,10 @@ public class MultiplayerGame {
             }
         }
 
-
         if (playerNames.size() > 1) {
             return playerNames.get(0) + ", " + playerNames.get(1) + " + " + (playerNames.size() - 1);
         } else {
-            return playerNames.size() == 0 ? "Solo game?" : playerNames.get(0);
+            return playerNames.size() == 0 ? "solo" : playerNames.get(0);
         }
     }
 
@@ -281,7 +280,6 @@ public class MultiplayerGame {
             long score = getTotalScoreForPlayer(player);
             playerScores.put(player, score);
             sortedScores.add(score);
-
         }
 
         Long playerScore = playerScores.get(playerId);
