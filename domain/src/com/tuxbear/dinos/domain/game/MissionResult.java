@@ -2,6 +2,8 @@ package com.tuxbear.dinos.domain.game;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @DynamoDBDocument
 public class MissionResult {
@@ -18,16 +20,19 @@ public class MissionResult {
     @DynamoDBAttribute
     private MoveSequence moveSequence;
 
-    @DynamoDBAttribute
-    private int score;
-
-    @DynamoDBAttribute
-    private int firstMoveScore;
-
-    @DynamoDBAttribute
-    private int moveScore;
-
     public MissionResult() {
+    }
+
+    @DynamoDBIgnore
+    @JsonIgnore
+    public Long getTimeSpent() {
+        return moveSequence.moves.get(moveSequence.moves.size()-1).getTimestamp();
+    }
+
+    @DynamoDBIgnore
+    @JsonIgnore
+    public int getNumberOfMoves() {
+        return moveSequence.moves.size();
     }
 
     public String getPlayerId() {
@@ -46,21 +51,6 @@ public class MissionResult {
         this.moveSequence = moveSequence;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public int getFirstMoveScore() {
-        return firstMoveScore;
-    }
-
-    public void setFirstMoveScore(int firstMoveScore) {
-        this.firstMoveScore = firstMoveScore;
-    }
 
     public String getMissionId() {
         return missionId;
@@ -76,13 +66,5 @@ public class MissionResult {
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
-    }
-
-    public int getMoveScore() {
-        return moveScore;
-    }
-
-    public void setMoveScore(int moveScore) {
-        this.moveScore = moveScore;
     }
 }

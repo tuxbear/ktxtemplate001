@@ -40,16 +40,15 @@ public class GameListWidget extends Table {
 
         for(final MultiplayerGame game : games) {
             row();
-            long score = game.getTotalScoreForPlayer(currentPlayer.getUsername());
             int rank = game.getPlayerRank(currentPlayer.getUsername());
-            int currentMissionNumber = game.getCurrentMissionNumber();
+            int currentMissionNumber = game.getCurrentMissionNumber(currentPlayer.getUsername());
             int numberOfMissions = game.getNumberOfMissions();
-            LocalGameState status = game.getLocalGameState(currentPlayer.getUsername());
+            GlobalGameState status = game.getState();
 
             add(String.format("#%s", rank)).width(150).center();
             add(String.format("%s", game.getOpponentString(currentPlayer.getUsername()))).width(350).center();
             add(String.format("%s / %s", currentMissionNumber, numberOfMissions)).width(200).center();
-            add(String.format("%s", status.prettyString())).width(200).center();
+            add(String.format("%s", status.getText())).width(200).center();
         }
 
         addListener(new ClickListener() {

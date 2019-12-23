@@ -1,15 +1,14 @@
 package com.tuxbear.dinos.ui.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.tuxbear.dinos.DinosGame;
 import com.tuxbear.dinos.domain.events.GameEvent;
 import com.tuxbear.dinos.domain.events.GameEventListener;
 import com.tuxbear.dinos.domain.events.MissionAccomplishedEvent;
@@ -38,6 +37,7 @@ import java.io.IOException;
 
 public class GameScreen extends AbstractFullScreen implements GameEventListener {
 
+    private final Player currentPlayer;
     private BoardWidget boardWidget;
     private RoundStatusBar statusBar;
     private EventBus eventBus = IoC.resolve(EventBus.class);
@@ -47,12 +47,14 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
     private MultiplayerGame dinosGameInstance;
 
-    public GameScreen(final DinosGame game, MultiplayerGame dinosGameInstance) throws IOException {
+    public GameScreen(final Game game, MultiplayerGame dinosGameInstance) throws IOException {
         super(game);
         if (dinosGameInstance == null) {
             logger.log("Trying to start a null-instace game!");
         }
         eventBus.subscribe(this, MissionAccomplishedEvent.class);
+
+        currentPlayer = playerService.getCurrentPlayer();
 
         this.dinosGameInstance = dinosGameInstance;
 
@@ -107,19 +109,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
     }
 
     private void refreshGameUi() throws IOException {
-        Player currentPlayer = playerService.getCurrentPlayer();
-        switch (dinosGameInstance.getLocalGameState(currentPlayer.getUsername())) {
-            case WAITING_FOR_OPPONENTS:
-                showMissionAccomplishedDialog();
-                break;
-            case WAITING_JUST_FOR_YOU:
-            case YOU_CAN_PLAY:
-                showMissionAccomplishedDialog();
-                break;
-            case ENDED:
-                showMissionAccomplishedDialog();
-                break;
-        }
+        showMissionAccomplishedDialog();
     }
 
     @Override
@@ -129,7 +119,8 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
     }
 
     private void showMissionStartDialog() {
-        MissionStartDialog missionStartDialog = new MissionStartDialog(this.dinosGameInstance, ResourceContainer.skin);
+
+        MissionStartDialog missionStartDialog = new MissionStartDialog(this.dinosGameInstance, currentPlayer, ResourceContainer.skin);
         missionStartDialog.show(stage, new DialogCallback() {
             @Override
             public void onDialogClose(Object dialogResult) throws IOException {
@@ -176,7 +167,6 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-
                     }
                 });
             } catch (IOException e) {
@@ -190,7 +180,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
         MissionEndDialog roundEndDialog = new MissionEndDialog(
                 this.dinosGameInstance,
                 ResourceContainer.skin,
-                dinosGameInstance.getCurrentMissionNumber()
+                dinosGameInstance.getCurrentMissionNumber(playerService.getCurrentPlayer().getUsername())
         );
 
         roundEndDialog.show(stage, new DialogCallback() {

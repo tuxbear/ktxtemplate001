@@ -21,18 +21,31 @@ public class ScoreTable extends Table {
         renderMissionScores(roundNumberForCompletedMission);
     }
 
+    private void addMoveCell(String value) {
+
+    }
+
+
+    private void addTimeCell(Long value) {
+
+    }
+
     public void renderMissionScores(int roundNumberForCompletedMission) {
         Mission missionToShowResultsFor = game.getMission(roundNumberForCompletedMission);
 
         clear();
 
-        add("<player>").expandX().center();
-        add("<moves>").expandX().center();
-        add("<time>").expandX().center();
-        add("<round>").expandX().center();
-        add("<total>").expandX().center();
-
+        add("player").expandX().center();
+        add("round").expandX().center();
+        add("total").expandX().center();
         row().height(100);
+
+        add("moves").expandX().right();
+        add("time").expandX().right();
+
+        add("moves").expandX().right();
+        add("time").expandX().right();
+
 
         for(String player : game.getPlayers()) {
 
@@ -42,17 +55,17 @@ public class ScoreTable extends Table {
             add(new PlayerWidget(player, skin)).expandX().center();
 
             if (roundResults != null) {
-                add(String.format("%s", roundResults.getMoveSequence().getMoves().size())).expandX().center();
-                add(String.format("%s", roundResults.getFirstMoveScore())).expandX().center();
-                add(String.format("%s", roundResults.getScore())).expandX().center();
-            } else {
-                add("-").expandX().center();
-                add("-").expandX().center();
-                add("-").expandX().center();
-            }
+                add(String.format("%s", roundResults.getNumberOfMoves())).expandX().right();
+                add(String.format("%s", roundResults.getTimeSpent())).expandX().right();
 
-            long totalScoreForPlayer = game.getTotalScoreForPlayer(player);
-            add(String.format("%s", totalScoreForPlayer)).expandX().center();
+                add(String.format("%s", game.getTotalMovesForPlayer(player))).expandX().right();
+                add(String.format("%s", game.getTotalTimeSpent(player))).expandX().right();
+            } else {
+                add("-").expandX().right();
+                add("-").expandX().right();
+                add("-").expandX().right();
+                add("-").expandX().right();
+            }
         }
 
         invalidate();

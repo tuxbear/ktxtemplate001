@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedJson
 import java.util.*
 
 @DynamoDBTable(tableName = "playerTable")
-class Player {
+public class Player {
     @DynamoDBHashKey
     var username: String? = null
 

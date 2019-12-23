@@ -5,7 +5,7 @@ enum class LocalGameState {
 
     fun prettyString(): String {
         return when (this) {
-            YOU_CAN_PLAY -> "Your turn"
+            YOU_CAN_PLAY -> "Game on!"
             WAITING_JUST_FOR_YOU -> "Everyone's waiting!"
             WAITING_FOR_OPPONENTS -> "Waiting"
             ENDED -> "Ended!"

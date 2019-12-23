@@ -126,7 +126,6 @@ public class FakeDataService implements DataService {
         }
 
         multiplayerGame.setMissions(missionList);
-        multiplayerGame.setCurrentMissionNumber(1);
         multiplayerGame.setId(UUID.randomUUID().toString());
 
         return multiplayerGame;

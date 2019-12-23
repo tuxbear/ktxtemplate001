@@ -3,11 +3,8 @@ package com.tuxbear.dinos.domain.game;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedJson;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tuxbear.dinos.domain.events.GameEvent;
@@ -21,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 @DynamoDBTable(tableName = "gamesTable")
 public class MultiplayerGame {
@@ -40,9 +36,6 @@ public class MultiplayerGame {
 
     @DynamoDBVersionAttribute
     private Integer version;
-
-    @DynamoDBAttribute
-    private int currentMissionNumber = 1;
 
     @DynamoDBAttribute
     private List<Mission> missions = new ArrayList<>();
@@ -107,7 +100,7 @@ public class MultiplayerGame {
 
     @DynamoDBIgnore
     public GlobalGameState calculateGlobalGameState() {
-        return currentMissionNumber > getNumberOfMissions() ? GlobalGameState.ENDED : GlobalGameState.ACTIVE;
+        return missionResults.size() == missions.size() * players.size() ? GlobalGameState.ENDED : GlobalGameState.ACTIVE;
     }
 
     @DynamoDBIgnore
@@ -117,9 +110,9 @@ public class MultiplayerGame {
             return LocalGameState.ENDED;
         }
 
-        MissionResult myResults = getMissionResultForPlayer(username, getCurrentMission().getId());
+        boolean haveCompletedAllMissions = isAllMissionsCompletedByPlayer(username);
 
-        if (myResults != null) {
+        if (haveCompletedAllMissions) {
             return LocalGameState.WAITING_FOR_OPPONENTS;
         } else {
             return LocalGameState.YOU_CAN_PLAY;
@@ -164,8 +157,8 @@ public class MultiplayerGame {
 
     @JsonIgnore
     @DynamoDBIgnore
-    public Mission getCurrentMission() {
-        return missions.get(getCurrentMissionNumber() - 1);
+    public Mission getCurrentMission(String playerId) {
+        return missions.get(getCurrentMissionNumber(playerId) - 1);
     }
 
     /**
@@ -175,36 +168,41 @@ public class MultiplayerGame {
      * @return
      */
     public List<GameEvent> reportResultForCurrentRound(MissionResult result) {
-        MissionResult existingResult = getMissionResultForPlayer(result.getPlayerId(), getCurrentMission().getId());
+        MissionResult existingResult = getMissionResultForPlayer(result.getPlayerId(), getCurrentMission(result.getPlayerId()).getId());
         if (existingResult != null) {
             throw new IllegalArgumentException("Cannot add result, it already exists for this the user " + result.getPlayerId());
         }
 
         missionResults.add(result);
-        List<GameEvent> events = new ArrayList<>();
-        if (isMissionCompletedByAllPlayers(getCurrentMission().getId())) {
-            // round end
-            events.add(new RoundEndEvent());
 
-            if (getCurrentMissionNumber() == getNumberOfMissions()) {
-                events.add(new GameOverEvent());
-            } else {
-                currentMissionNumber++;
-            }
+        List<GameEvent> events = new ArrayList<>();
+        if (calculateGlobalGameState() == GlobalGameState.ENDED) {
+            events.add(new GameOverEvent());
         }
 
         return events;
     }
 
-    public long getTotalScoreForPlayer(String player) {
-        long score = 0;
+    public long getTotalMovesForPlayer(String player) {
+        long moves = 0;
         for (MissionResult result : missionResults) {
             if (result != null && result.getPlayerId().equals(player)) {
-                score += result.getScore();
+                moves += result.getNumberOfMoves();
             }
         }
 
-        return score;
+        return moves;
+    }
+
+    public long getTotalTimeSpent(String player) {
+        long timeSpent = 0;
+        for (MissionResult result : missionResults) {
+            if (result != null && result.getPlayerId().equals(player)) {
+                timeSpent += result.getTimeSpent();
+            }
+        }
+
+        return timeSpent;
     }
 
     public String getOpponentString(String currentPlayerId) {
@@ -222,6 +220,11 @@ public class MultiplayerGame {
         }
     }
 
+    public boolean isAllMissionsCompletedByPlayer(String playerId) {
+        return missionResults.stream()
+                .filter(mr -> mr.getPlayerId().equals(playerId))
+                .count() == missions.size();
+    }
 
     public boolean isMissionCompletedByAllPlayers(String missionId) {
         for (String player : getPlayers()) {
@@ -249,12 +252,11 @@ public class MultiplayerGame {
         return missions.size();
     }
 
-    public int getCurrentMissionNumber() {
-        return currentMissionNumber;
-    }
 
-    public void setCurrentMissionNumber(int currentMissionNumber) {
-        this.currentMissionNumber = currentMissionNumber;
+    @DynamoDBIgnore
+    @JsonIgnore
+    public int getCurrentMissionNumber(String playerId) {
+        return (int) (missionResults.stream().filter(mr -> mr.getPlayerId().equals(playerId)).count() + 1);
     }
 
     public List<Mission> getMissions() {
@@ -274,17 +276,7 @@ public class MultiplayerGame {
     }
 
     public int getPlayerRank(String playerId) {
-        HashMap<String, Long> playerScores = new HashMap<>();
-        TreeSet sortedScores = new TreeSet();
-        for (String player : players) {
-            long score = getTotalScoreForPlayer(player);
-            playerScores.put(player, score);
-            sortedScores.add(score);
-        }
-
-        Long playerScore = playerScores.get(playerId);
-
-        return new ArrayList(sortedScores).indexOf(playerScore) + 1;
+        return -1;
     }
 
     public Date getLastUpdated() {

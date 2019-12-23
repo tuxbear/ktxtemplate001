@@ -138,7 +138,6 @@ class ReportMissionResultHandler : AbstractAuthorizedHandler {
                 return APIGatewayProxyResponseEvent().withStatusCode(400)
             }
 
-            result.score = ArcadeGameScoreService().getScore(result)
             game.reportResultForCurrentRound(result)
             game.state = game.calculateGlobalGameState()
 

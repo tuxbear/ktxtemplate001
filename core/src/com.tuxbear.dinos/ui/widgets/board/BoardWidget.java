@@ -94,18 +94,18 @@ public class BoardWidget extends WidgetGroup {
         resetDinoPositions();
     }
 
-    public void checkAndStartNextMission() {
+    public void checkAndStartNextMission() throws IOException {
         restartCurrentMission();
         eventBus.publishEvent(new MissionStartingEvent(currentMission));
     }
 
-    private void restartCurrentMission() {
+    private void restartCurrentMission() throws IOException {
         resetDinoPositions();
         currentMissionMovesMade = 0;
         currentMissionTimeSpent = 0;
         currentMoveSequence = new MoveSequence();
         isSolvingMission = true;
-        currentMission = game.getCurrentMission();
+        currentMission = game.getCurrentMission(playerService.getCurrentPlayer().getUsername());
         currentMissionActor.setBoardPosition(currentMission.getPosition());
     }
 
@@ -181,20 +181,11 @@ public class BoardWidget extends WidgetGroup {
         if (getDinoByNumber(currentMission.getPieceNumber()).getBoardPosition().equals(currentMission.getPosition())) {
             winSound.play(SettingsService.EFFECTS_VOLUME);
             isSolvingMission = false;
-            int timeSpentRoundedDown = (int) Math.floor(currentMissionTimeSpent);
 
             MissionResult result = new MissionResult();
             result.setGameId(game.getId());
-            result.setFirstMoveScore(timeSpentRoundedDown);
             result.setMissionId(currentMission.getId());
             result.setMoveSequence(currentMoveSequence);
-            ScoreService scoreService = IoC.resolve(ScoreService.class);
-
-            int score = scoreService.getScore(result);
-
-            result.setScore(score);
-            result.setFirstMoveScore(scoreService.getFirstMoverScore(currentMoveSequence.getMoves().get(0).getTimestamp()));
-            result.setMoveScore(scoreService.getMoveScore(currentMoveSequence.getMoves().size()));
 
             result.setPlayerId(playerService.getCurrentPlayer().getUsername());
 

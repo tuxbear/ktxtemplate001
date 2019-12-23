@@ -17,9 +17,9 @@ public abstract class AbstractScreen implements Screen {
     private Viewport viewPort = new ScalingViewport(Scaling.fit, 1080, 1980);
     Stage stage = new Stage(viewPort);
 
-    final DinosGame game;
+    final Game game;
 
-    public AbstractScreen(DinosGame game) {
+    public AbstractScreen(Game game) {
         this.game = game;
     }
 

@@ -1,5 +1,6 @@
 package com.tuxbear.dinos.ui.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
@@ -26,7 +27,7 @@ public class GameListScreen extends AbstractFullScreen {
 
     private final LoadingDialog loadingGamesProgressDialog;
 
-    public GameListScreen(final DinosGame game) {
+    public GameListScreen(final Game game) {
         super(game);
 
         final Skin skin = ResourceContainer.skin;

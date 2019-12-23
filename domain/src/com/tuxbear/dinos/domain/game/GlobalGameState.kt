@@ -5,5 +5,14 @@ package com.tuxbear.dinos.domain.game
  * Templates.
  */
 enum class GlobalGameState {
-    ACTIVE, ABORTED, ENDED
+    ACTIVE, ABORTED, ENDED;
+
+    fun getText(): String {
+        return when (this) {
+            ACTIVE -> "Game on"
+            ABORTED -> "Aborted"
+            ENDED -> "Completed"
+            else -> "?"
+        }
+    }
 }

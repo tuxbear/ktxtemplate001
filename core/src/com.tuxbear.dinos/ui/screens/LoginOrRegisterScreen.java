@@ -1,5 +1,6 @@
 package com.tuxbear.dinos.ui.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -27,7 +28,7 @@ public class LoginOrRegisterScreen extends AbstractFullScreen {
     TextField usernameTextField = new TextField("", ResourceContainer.skin);
     TextField passwordTextField = new TextField("", ResourceContainer.skin);
 
-    public LoginOrRegisterScreen(DinosGame game) {
+    public LoginOrRegisterScreen(Game game) {
         super(game);
 
         Table ct = rootTable;

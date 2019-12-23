@@ -1,5 +1,6 @@
 package com.tuxbear.dinos.ui.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.tuxbear.dinos.DinosGame;
 
@@ -9,7 +10,7 @@ import com.tuxbear.dinos.DinosGame;
 public abstract class AbstractFullScreen extends AbstractScreen {
     Table rootTable;
 
-    public AbstractFullScreen(DinosGame game) {
+    public AbstractFullScreen(Game game) {
         super(game);
 
         rootTable = new Table();

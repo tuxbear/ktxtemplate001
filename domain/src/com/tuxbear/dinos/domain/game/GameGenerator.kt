@@ -1,6 +1,5 @@
 package com.tuxbear.dinos.domain.game
 
-import com.tuxbear.dinos.domain.user.Player
 import java.util.*
 
 object GameGenerator {
@@ -59,7 +58,6 @@ object GameGenerator {
         }
         multiplayerGame.missions = missionList
         multiplayerGame.state = GlobalGameState.ACTIVE
-        multiplayerGame.currentMissionNumber = 1
         multiplayerGame.id = UUID.randomUUID().toString()
         return multiplayerGame
     }
