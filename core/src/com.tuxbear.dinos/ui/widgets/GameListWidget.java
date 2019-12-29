@@ -1,5 +1,6 @@
 package com.tuxbear.dinos.ui.widgets;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
@@ -10,9 +11,6 @@ import com.tuxbear.dinos.services.*;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * User: tuxbear Date: 19/01/14 Time: 11:30
- */
 public class GameListWidget extends Table {
 
 
@@ -28,7 +26,6 @@ public class GameListWidget extends Table {
     }
 
     public void renderGameList() throws IOException {
-
         clear();
 
         Player currentPlayer = playerService.getCurrentPlayer();
@@ -43,12 +40,12 @@ public class GameListWidget extends Table {
             int rank = game.getPlayerRank(currentPlayer.getUsername());
             int currentMissionNumber = game.getCurrentMissionNumber(currentPlayer.getUsername());
             int numberOfMissions = game.getNumberOfMissions();
-            GlobalGameState status = game.getState();
+            LocalGameState status = game.getLocalGameState(currentPlayer.getUsername());
 
             add(String.format("#%s", rank)).width(150).center();
             add(String.format("%s", game.getOpponentString(currentPlayer.getUsername()))).width(350).center();
             add(String.format("%s / %s", currentMissionNumber, numberOfMissions)).width(200).center();
-            add(String.format("%s", status.getText())).width(200).center();
+            add(String.format("%s", status.prettyString())).width(200).center();
         }
 
         addListener(new ClickListener() {
@@ -87,7 +84,7 @@ public class GameListWidget extends Table {
     private void setBackgroundForCellsInRow(int rowNum) {
         for(Cell cell : getCells()) {
             if ( cell.getRow() == rowNum ) {
-                // set background color
+                cell.getActor().setColor(Color.BLUE);
             }
         }
     }

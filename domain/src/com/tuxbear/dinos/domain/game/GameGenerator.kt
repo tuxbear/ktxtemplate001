@@ -50,10 +50,11 @@ object GameGenerator {
                 BoardPosition(0, 3),
                 BoardPosition(1, 4)
         )
+
         val missionList = ArrayList<Mission>()
-        for (i in missionPos.indices) {
+        for (i in 0 until rounds) {
             val dino = rand.nextInt(4)
-            val pos = missionPos[i]
+            val pos = missionPos[rand.nextInt(missionPos.size)]
             missionList.add(generateRound(i + 1, dino, pos.x, pos.y))
         }
         multiplayerGame.missions = missionList

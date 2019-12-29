@@ -16,6 +16,7 @@ import com.tuxbear.dinos.domain.game.MultiplayerGame;
 import com.tuxbear.dinos.domain.user.Player;
 import com.tuxbear.dinos.services.DataService;
 import com.tuxbear.dinos.services.IoC;
+import com.tuxbear.dinos.services.LocalStorage;
 import com.tuxbear.dinos.services.Logger;
 import com.tuxbear.dinos.services.PlayerService;
 import com.tuxbear.dinos.services.ResourceContainer;
@@ -43,6 +44,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
     private EventBus eventBus = IoC.resolve(EventBus.class);
     private PlayerService playerService = IoC.resolve(PlayerService.class);
     private DataService dataService = IoC.resolve(DataService.class);
+    private LocalStorage storage = IoC.resolve(LocalStorage.class);
     private Logger logger = IoC.resolve(Logger.class);
 
     private MultiplayerGame dinosGameInstance;
@@ -145,7 +147,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
     }
 
     @Override
-    public void processEvent(GameEvent event) throws IOException {
+    public void processEvent(GameEvent event) {
 
         if (event instanceof MissionAccomplishedEvent) {
             MissionAccomplishedEvent missionEvent = (MissionAccomplishedEvent) event;
@@ -158,15 +160,16 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                         // TODO: handle status FAILED
                         if (status.getStatus().equals(ServerCallStatus.SUCCESS)) {
                             dinosGameInstance = result;
+                        } else {
+                            // save round result to the local game and to disk for sync later
+
+
+
+
                         }
 
                         sendingDialog.hide();
                         showMissionAccomplishedDialog();
-                        try {
-                            GameScreen.this.refreshGameUi();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
                     }
                 });
             } catch (IOException e) {
@@ -185,7 +188,7 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
 
         roundEndDialog.show(stage, new DialogCallback() {
             @Override
-            public void onDialogClose(Object dialogResult) throws IOException {
+            public void onDialogClose(Object dialogResult) {
                 String result = dialogResult.toString();
                 switch (result) {
                     case "main menu":
@@ -197,6 +200,10 @@ public class GameScreen extends AbstractFullScreen implements GameEventListener 
                         break;
 
                     case "next":
+
+                        roundEndDialog.hide();
+                        Gdx.graphics.requestRendering();
+
                         GameScreen.this.showMissionStartDialog();
 
                         break;

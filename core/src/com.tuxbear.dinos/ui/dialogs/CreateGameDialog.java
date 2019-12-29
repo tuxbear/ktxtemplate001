@@ -30,6 +30,9 @@ public class CreateGameDialog extends AbstractCallbackDialog {
         final SelectBox<String> difficultySelect = new SelectBox<>(skin);
         difficultySelect.setItems("easy", "normal", "hard");
 
+        final SelectBox<Integer> numberOfRoundsSelect= new SelectBox<>(skin);
+        numberOfRoundsSelect.setItems(5, 10, 15, 25, 50);
+
         Table friendSelectList = new Table(skin);
 
         final ValueCheckboxGroup<String> selectedFriendsGroup = new ValueCheckboxGroup<>();
@@ -50,6 +53,8 @@ public class CreateGameDialog extends AbstractCallbackDialog {
         contentTable.row();
         contentTable.add("Difficulty");
         contentTable.add(difficultySelect);
+        contentTable.add("Number of rounds");
+        contentTable.add(numberOfRoundsSelect);
         contentTable.row();
         contentTable.add("Opponents").colspan(2);
         contentTable.row();

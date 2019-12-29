@@ -1,8 +1,11 @@
 package com.tuxbear.dinos.ui.dialogs;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.tuxbear.dinos.services.ResourceContainer;
 
 import java.io.IOException;
 
@@ -16,22 +19,21 @@ public abstract class AbstractCallbackDialog extends Dialog {
     public AbstractCallbackDialog(String title, Skin skin) {
         super(title, skin);
 
-        getTitleLabel().setFontScale(3.0f);
+        getTitleLabel().setStyle(new Label.LabelStyle(ResourceContainer.normalFont, Color.BLACK));
 
         setMovable(false);
         invalidateHierarchy();
     }
 
     public void show(Stage stage, DialogCallback callbackHandler) {
-        this.callbackHandler = callbackHandler;
         super.show(stage);
+        this.callbackHandler = callbackHandler;
     }
 
     @Override
     public void result(Object result) {
         if(callbackHandler != null) {
             try {
-                this.remove();
                 callbackHandler.onDialogClose(result);
             } catch (IOException e) {
                 throw new RuntimeException(e);

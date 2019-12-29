@@ -1,5 +1,6 @@
 package com.tuxbear.dinos.ui.dialogs;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
@@ -7,14 +8,11 @@ import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.domain.user.Player;
 import com.tuxbear.dinos.services.IoC;
 import com.tuxbear.dinos.services.PlayerService;
+import com.tuxbear.dinos.services.ResourceContainer;
 import com.tuxbear.dinos.ui.widgets.*;
 
 import java.io.IOException;
 
-/**
- * Created with IntelliJ IDEA. User: tuxbear Date: 03/01/14 Time: 16:21 To change this template use File | Settings | File
- * Templates.
- */
 public class MissionEndDialog extends AbstractCallbackDialog {
 
     private final ScoreTable scoreTable;
@@ -28,11 +26,14 @@ public class MissionEndDialog extends AbstractCallbackDialog {
     private final Button prevMissionButton;
 
     private final Button nextMissionButton;
+    private final Label missionNumberLabel;
 
     public MissionEndDialog(MultiplayerGame game, Skin skin, int roundNumberToShow) throws IOException {
         super("Food found!", skin);
         this.initialMissionNumberToShow = roundNumberToShow;
         this.missionNumberToShow = roundNumberToShow;
+
+        missionNumberLabel = new Label(String.valueOf(roundNumberToShow), new Label.LabelStyle(ResourceContainer.largeFont, Color.FOREST));
 
         Table table = getContentTable();
 
@@ -54,12 +55,13 @@ public class MissionEndDialog extends AbstractCallbackDialog {
         });
 
         table.add(prevMissionButton).left();
-        table.add(nextMissionButton).left();
+        table.add(missionNumberLabel).center().expandX();
+        table.add(nextMissionButton).right();
 
         table.row();
 
         scoreTable = new ScoreTable(game, skin, roundNumberToShow);
-        table.add(scoreTable).fill();
+        table.add(scoreTable).colspan(3).fill();
 
         button("Main Menu", "main menu");
         button("Review", "review");
@@ -76,27 +78,29 @@ public class MissionEndDialog extends AbstractCallbackDialog {
 
     private void goOneMissionForward() {
         missionNumberToShow++;
+        missionNumberLabel.setText(String.valueOf(missionNumberToShow));
         renderMissionScores();
         enableDisableNavButtons();
     }
 
     private void goOneMissionBack() {
         missionNumberToShow--;
+        missionNumberLabel.setText(String.valueOf(missionNumberToShow));
         renderMissionScores();
         enableDisableNavButtons();
     }
 
     private void enableDisableNavButtons() {
         if (missionNumberToShow <= 1) {
-            prevMissionButton.setDisabled(true);
+            prevMissionButton.setVisible(false);
         } else {
-            prevMissionButton.setDisabled(false);
+            prevMissionButton.setVisible(true);
         }
 
         if (missionNumberToShow >= initialMissionNumberToShow) {
-            nextMissionButton.setDisabled(true);
+            nextMissionButton.setVisible(false);
         } else {
-            nextMissionButton.setDisabled(false);
+            nextMissionButton.setVisible(true);
         }
     }
 

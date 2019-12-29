@@ -9,7 +9,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tuxbear.dinos.domain.events.GameEvent;
 import com.tuxbear.dinos.domain.events.GameOverEvent;
-import com.tuxbear.dinos.domain.events.RoundEndEvent;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -128,7 +127,7 @@ public class MultiplayerGame {
     }
 
     public Mission getMission(int missionNumber) {
-        return missions.get(missionNumber - 1);
+        return missions.get(missionNumber);
     }
 
     public Board getBoard() {
@@ -158,7 +157,7 @@ public class MultiplayerGame {
     @JsonIgnore
     @DynamoDBIgnore
     public Mission getCurrentMission(String playerId) {
-        return missions.get(getCurrentMissionNumber(playerId) - 1);
+        return missions.get(getCurrentMissionNumber(playerId));
     }
 
     /**
@@ -256,7 +255,7 @@ public class MultiplayerGame {
     @DynamoDBIgnore
     @JsonIgnore
     public int getCurrentMissionNumber(String playerId) {
-        return (int) (missionResults.stream().filter(mr -> mr.getPlayerId().equals(playerId)).count() + 1);
+        return (int) (missionResults.stream().filter(mr -> mr.getPlayerId().equals(playerId)).count());
     }
 
     public List<Mission> getMissions() {

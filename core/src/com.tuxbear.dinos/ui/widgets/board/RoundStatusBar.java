@@ -1,5 +1,6 @@
 package com.tuxbear.dinos.ui.widgets.board;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
@@ -8,24 +9,23 @@ import com.tuxbear.dinos.domain.game.*;
 import com.tuxbear.dinos.services.*;
 import com.tuxbear.dinos.services.events.*;
 
-import java.time.Instant;
-
+/**
+ * Created with IntelliJ IDEA. User: tuxbear Date: 08/12/13 Time: 16:10 To change this template use File | Settings | File
+ * Templates.
+ */
 public class RoundStatusBar extends Table implements GameEventListener{
-    private final Label totalScoreLabel;
     EventBus eventBus = IoC.resolve(EventBus.class);
 
     private int numberOfMoves;
+    private float elapsed;
 
-    private final Label moveScoreLabel;
+    private final Label movesLabel;
 
-    private final Label firstMoveScoreLabel;
+    private final Label timeLabel;
 
     private boolean isRoundActive;
-    private Long firstMoveTime;
 
     private final Image missionDinoImage;
-    private ScoreService scoreService = new ArcadeGameScoreService();
-    private long missionStartTime;
 
 
     public RoundStatusBar(Skin skin) {
@@ -34,29 +34,28 @@ public class RoundStatusBar extends Table implements GameEventListener{
 
         missionDinoImage = new Image();
 
-        moveScoreLabel = new Label("0", skin);
-        firstMoveScoreLabel = new Label("0", skin);
-        totalScoreLabel = new Label("0", skin);
-        totalScoreLabel.setFontScale(2.0f);
 
-        add(missionDinoImage).padRight(50);
-        add(firstMoveScoreLabel).width(100);
-        add(" + ").width(50);
-        add(moveScoreLabel).width(100);
-        add(" = ").width(50);
-        add(totalScoreLabel).width(100);
+        movesLabel = new Label("0", skin);
+        timeLabel = new Label("00:00", skin);
+
+        movesLabel.setStyle(new Label.LabelStyle(ResourceContainer.largeFont, Color.BLUE));
+        timeLabel.setStyle(new Label.LabelStyle(ResourceContainer.largeFont, Color.BLUE));
+
+        add(missionDinoImage).pad(20);
+        add(movesLabel).pad(20);
+        add(timeLabel).pad(20);
     }
 
     @Override
     public void act(float delta) {
-        super.act(delta);
         if (isRoundActive) {
-            int moveScore = scoreService.getMoveScore(numberOfMoves);
-            moveScoreLabel.setText(moveScore);
-            long timeToUse = firstMoveTime == 0 ? Instant.now().toEpochMilli() - missionStartTime : firstMoveTime;
-            int firstMoverScore = scoreService.getFirstMoverScore(timeToUse);
-            firstMoveScoreLabel.setText(firstMoverScore);
-            totalScoreLabel.setText(moveScore + firstMoverScore);
+            elapsed += delta;
+            int elapsedSeconds = (int)Math.floor(elapsed);
+            int elapsedMinutes = elapsedSeconds / 60;
+            elapsedSeconds = elapsedSeconds % 60;
+            movesLabel.setText("" + numberOfMoves);
+
+            timeLabel.setText( String.format("%02d:%02d", elapsedMinutes, elapsedSeconds));
             invalidateHierarchy();
         }
     }
@@ -69,15 +68,12 @@ public class RoundStatusBar extends Table implements GameEventListener{
         } else if (eventType == MissionAccomplishedEvent.class) {
             onMissionAccomplished();
         } else if (eventType == DinoMovedEvent.class) {
-            onDinoMoved((DinoMovedEvent) event);
+            onDinoMoved();
         }
     }
 
-    private void onDinoMoved(DinoMovedEvent event) {
+    private void onDinoMoved() {
         numberOfMoves++;
-        if (firstMoveTime == 0) {
-            firstMoveTime = event.getMove().getTimestamp();
-        }
     }
 
     private void onMissionAccomplished() {
@@ -87,8 +83,7 @@ public class RoundStatusBar extends Table implements GameEventListener{
     private void onStartMission(Mission mission) {
         missionDinoImage.setDrawable(new SpriteDrawable(new Sprite(DinoActor.getDinoTextureFromNumber(mission.getPieceNumber()))));
         numberOfMoves = 0;
-        firstMoveTime = 0l;
-        missionStartTime = Instant.now().toEpochMilli();
+        elapsed = 0;
         isRoundActive = true;
     }
 }

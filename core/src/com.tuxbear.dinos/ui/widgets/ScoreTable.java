@@ -22,30 +22,33 @@ public class ScoreTable extends Table {
     }
 
     private void addMoveCell(String value) {
-
+        add(value).pad(20);
     }
 
-
-    private void addTimeCell(Long value) {
+    private void addTimeCell(String value) {
+        add(value).pad(20);
 
     }
 
     public void renderMissionScores(int roundNumberForCompletedMission) {
-        Mission missionToShowResultsFor = game.getMission(roundNumberForCompletedMission);
 
+        int missionToShow = Math.min(roundNumberForCompletedMission, game.getNumberOfMissions()-1);
+
+        Mission missionToShowResultsFor = game.getMission(missionToShow);
         clear();
 
-        add("player").expandX().center();
-        add("round").expandX().center();
-        add("total").expandX().center();
-        row().height(100);
+        add("player");
+        add("round").colspan(2);
+        add("total").colspan(2);
+        row();
 
-        add("moves").expandX().right();
-        add("time").expandX().right();
+        add(" ");
 
-        add("moves").expandX().right();
-        add("time").expandX().right();
+        addMoveCell("Moves");
+        addTimeCell("Time");
 
+        addMoveCell("Moves");
+        addTimeCell("Time");
 
         for(String player : game.getPlayers()) {
 
@@ -55,16 +58,26 @@ public class ScoreTable extends Table {
             add(new PlayerWidget(player, skin)).expandX().center();
 
             if (roundResults != null) {
-                add(String.format("%s", roundResults.getNumberOfMoves())).expandX().right();
-                add(String.format("%s", roundResults.getTimeSpent())).expandX().right();
 
-                add(String.format("%s", game.getTotalMovesForPlayer(player))).expandX().right();
-                add(String.format("%s", game.getTotalTimeSpent(player))).expandX().right();
+                int elapsedRoundSeconds = (int)Math.floor(roundResults.getTimeSpent() / 1000);
+                int elapsedRoundMinutes = elapsedRoundSeconds / 60;
+                elapsedRoundSeconds = elapsedRoundSeconds % 60;
+
+                addMoveCell(String.format("%s", roundResults.getNumberOfMoves()));
+                addTimeCell(String.format("%s", String.format("%02d:%02d", elapsedRoundMinutes, elapsedRoundSeconds)));
+
+
+                int elapsedGameSeconds = (int)Math.floor(game.getTotalTimeSpent(player) / 1000);
+                int elapsedGameMinutes = elapsedGameSeconds / 60;
+                elapsedGameSeconds = elapsedGameSeconds % 60;
+
+                addMoveCell(String.format("%s", game.getTotalMovesForPlayer(player)));
+                addTimeCell(String.format("%s", String.format("%02d:%02d", elapsedGameMinutes, elapsedGameSeconds)));
             } else {
-                add("-").expandX().right();
-                add("-").expandX().right();
-                add("-").expandX().right();
-                add("-").expandX().right();
+                addMoveCell("-");
+                addTimeCell("-");
+                addMoveCell("-");
+                addTimeCell("-");
             }
         }
 
